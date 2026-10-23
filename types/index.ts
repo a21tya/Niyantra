@@ -233,5 +233,23 @@ export interface EvaluationSuiteResult {
 export * from "./scanner";
 
 // Milestone 8 Ingestion & Scan Lifecycle Contract
-export * from "@/lib/ingestion/contract";
+export type {
+  SourceLocation,
+  ScanWarning,
+  ExtractedContentItem,
+  ResourceLimitsEncountered,
+  FileCategory,
+} from "@/lib/ingestion/contract";
+export {
+  ScanStatusSchema,
+  SourceLocationSchema,
+  ScanWarningSchema,
+  ScanErrorSchema,
+  ExtractedContentItemSchema,
+  ResourceLimitsEncounteredSchema,
+  ExtractionResultSchema,
+  ScanJobSchema,
+  LEGAL_STATUS_TRANSITIONS,
+  isValidStatusTransition,
+} from "@/lib/ingestion/contract";
 
