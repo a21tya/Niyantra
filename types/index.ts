@@ -1,6 +1,6 @@
 export type SecurityDecision = "ALLOW" | "BLOCK" | "REQUIRE_APPROVAL";
 
-export type SeverityLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type SeverityLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" | "INFORMATIONAL";
 
 export type ScenarioType =
   | "LEGITIMATE_QUERY"
@@ -229,4 +229,6 @@ export interface EvaluationSuiteResult {
   benchmarkScorePercent: number;
   cases: EvaluationCaseResult[];
 }
+
+export * from "./scanner";
 

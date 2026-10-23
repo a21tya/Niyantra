@@ -22,6 +22,11 @@ import {
   ChevronLeft,
   RotateCcw,
   Globe,
+  UploadCloud,
+  History,
+  ShieldAlert,
+  BarChart3,
+  Layers,
 } from "lucide-react";
 import {
   ApprovalRequest,
@@ -33,6 +38,14 @@ import {
   SecurityPolicy,
   UserRole,
 } from "@/types";
+import { ScanJob, Finding } from "@/types/scanner";
+import { SYNTHETIC_DEMO_SAMPLES } from "@/lib/scanner/synthetic-samples";
+import { scanApiClient } from "@/lib/api/scan-client";
+import { ScanWorkspace } from "@/components/scanner/ScanWorkspace";
+import { ScanResultsView } from "@/components/scanner/ScanResultsView";
+import { FindingsExplorer } from "@/components/scanner/FindingsExplorer";
+import { ScanHistoryView } from "@/components/scanner/ScanHistoryView";
+import { ArtifactSecurityDashboard } from "@/components/scanner/ArtifactSecurityDashboard";
 import { ACTIVE_POLICIES } from "@/lib/data/mock-data";
 import { DEMO_SCENARIOS } from "@/lib/security/client-metadata";
 import { Kbd } from "@/components/ui/Primitives";
@@ -146,6 +159,30 @@ export default function AegisApp() {
     type: "success" | "error" | "info";
     message: string;
   } | null>(null);
+
+  // Milestone 10: Artifact Security Scanner State
+  const [scansList, setScansList] = useState<ScanJob[]>(() =>
+    SYNTHETIC_DEMO_SAMPLES.map((s) => s.job)
+  );
+  const [currentScanJob, setCurrentScanJob] = useState<ScanJob | null>(() =>
+    SYNTHETIC_DEMO_SAMPLES[1].job
+  );
+  const [isScanningArtifact, setIsScanningArtifact] = useState(false);
+
+  const fetchScansList = useCallback(async () => {
+    try {
+      const res = await scanApiClient.listScans();
+      if (res.success && res.data && res.data.length > 0) {
+        setScansList(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch scans list", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchScansList();
+  }, [fetchScansList]);
 
   // Global Cmd+K shortcut
   useEffect(() => {
@@ -515,11 +552,15 @@ export default function AegisApp() {
     badge?: string | number;
   }> = [
     { id: "overview", label: "Overview", icon: <Activity className="w-4 h-4" /> },
+    { id: "scan-workspace", label: "Scan Workspace", icon: <UploadCloud className="w-4 h-4" /> },
+    { id: "scan-results", label: "Scan Findings", icon: <ShieldAlert className="w-4 h-4" />, badge: currentScanJob?.findings.length ? currentScanJob.findings.length : undefined },
+    { id: "scan-history", label: "Scan History", icon: <History className="w-4 h-4" />, badge: scansList.length },
+    { id: "scan-dashboard", label: "Artifact Intelligence", icon: <BarChart3 className="w-4 h-4" /> },
     { id: "playground", label: "Agent Playground", icon: <MessageSquare className="w-4 h-4" /> },
     { id: "policies", label: "Policies", icon: <Shield className="w-4 h-4" /> },
     { id: "evaluation", label: "Evaluations", icon: <CheckSquare className="w-4 h-4" /> },
     { id: "audit", label: "Audit Log", icon: <FileText className="w-4 h-4" /> },
-    { id: "approvals", label: "Approvals", icon: <Clock className="w-4 h-4" />, badge: 2 },
+    { id: "approvals", label: "Approvals", icon: <Clock className="w-4 h-4" />, badge: pendingApprovals.length },
     { id: "tools", label: "Tools", icon: <Wrench className="w-4 h-4" /> },
     { id: "settings", label: "Settings", icon: <Settings className="w-4 h-4" /> },
   ];
@@ -959,6 +1000,88 @@ export default function AegisApp() {
                 setInspectorTarget({ type: "policy", policyId })
               }
               onRunEvaluation={runEvaluationBenchmark}
+            />
+          )}
+
+          {activeTab === "scan-workspace" && (
+            <ScanWorkspace
+              isScanning={isScanningArtifact}
+              setIsScanning={setIsScanningArtifact}
+              onScanCompleted={(job) => {
+                setCurrentScanJob(job);
+                fetchScansList();
+                setActiveTab("scan-results");
+                setNotification({
+                  type: "success",
+                  message: `Artifact scan completed for ${job.artifact.name}. Risk Score: ${job.assessment?.score ?? 0}/100.`,
+                });
+              }}
+              onViewSample={(sample) => {
+                setCurrentScanJob(sample.job);
+                setActiveTab("scan-results");
+              }}
+            />
+          )}
+
+          {activeTab === "scan-results" && (
+            <div className="space-y-6">
+              {currentScanJob ? (
+                <>
+                  <ScanResultsView
+                    scanJob={currentScanJob}
+                    onSelectFinding={() => {}}
+                    onNavigateToFindings={() => {
+                      const el = document.getElementById("findings-section");
+                      el?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  />
+                  <div id="findings-section" className="pt-2">
+                    <FindingsExplorer
+                      findings={currentScanJob.findings}
+                      artifactName={currentScanJob.artifact.name}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="p-12 text-center rounded-2xl border border-dashed border-[#d8ded5] bg-white space-y-3">
+                  <div className="font-display font-semibold text-sm text-[#111613]">
+                    No artifact scan selected
+                  </div>
+                  <div className="text-xs text-[#79877e]">
+                    Please upload an artifact in the Workspace or load a demonstration sample.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("scan-workspace")}
+                    className="px-4 py-2 rounded-lg bg-[#0e291c] text-white text-xs font-mono font-semibold"
+                  >
+                    Go to Workspace
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "scan-history" && (
+            <ScanHistoryView
+              scans={scansList}
+              onRefreshScans={fetchScansList}
+              onSelectScan={(scan) => {
+                setCurrentScanJob(scan);
+                setActiveTab("scan-results");
+              }}
+            />
+          )}
+
+          {activeTab === "scan-dashboard" && (
+            <ArtifactSecurityDashboard
+              scans={scansList}
+              onNavigateToWorkspace={() => setActiveTab("scan-workspace")}
+              onNavigateToHistory={() => setActiveTab("scan-history")}
+              onSelectScan={(scan) => {
+                setCurrentScanJob(scan);
+                setActiveTab("scan-results");
+              }}
             />
           )}
 

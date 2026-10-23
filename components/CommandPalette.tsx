@@ -16,6 +16,10 @@ import {
   XCircle,
   ArrowRight,
   Zap,
+  UploadCloud,
+  History,
+  ShieldAlert,
+  BarChart3,
 } from "lucide-react";
 import { AuditEvent, ScenarioType, UserRole } from "@/types";
 import {
@@ -27,6 +31,10 @@ import { Kbd, VerdictBadge } from "@/components/ui/Primitives";
 
 export type AppScreenId =
   | "overview"
+  | "scan-workspace"
+  | "scan-results"
+  | "scan-history"
+  | "scan-dashboard"
   | "playground"
   | "policies"
   | "audit"
@@ -95,6 +103,42 @@ export function CommandPalette({
         badge: "VIEW 01",
         icon: <Activity className="w-4 h-4 text-[#0e291c]" />,
         onSelect: () => onNavigate("overview"),
+      },
+      {
+        id: "nav-scan-workspace",
+        group: "NAVIGATION",
+        title: "Go to Artifact Scan Workspace",
+        subtitle: "Upload source files, scripts, prompts, skills & MCP configs for inspection",
+        badge: "ARTIFACTS",
+        icon: <UploadCloud className="w-4 h-4 text-[#10b981]" />,
+        onSelect: () => onNavigate("scan-workspace"),
+      },
+      {
+        id: "nav-scan-results",
+        group: "NAVIGATION",
+        title: "Go to Artifact Scan Findings",
+        subtitle: "Review detected violations, evidence redaction, and diff remediation",
+        badge: "FINDINGS",
+        icon: <ShieldAlert className="w-4 h-4 text-[#10b981]" />,
+        onSelect: () => onNavigate("scan-results"),
+      },
+      {
+        id: "nav-scan-history",
+        group: "NAVIGATION",
+        title: "Go to Artifact Scan History",
+        subtitle: "Catalog of analyzed artifacts, risk scores, and exported SARIF/JSON reports",
+        badge: "HISTORY",
+        icon: <History className="w-4 h-4 text-[#10b981]" />,
+        onSelect: () => onNavigate("scan-history"),
+      },
+      {
+        id: "nav-scan-dashboard",
+        group: "NAVIGATION",
+        title: "Go to Artifact Security Intelligence",
+        subtitle: "Aggregated telemetry, severity breakdown, and threat category distribution",
+        badge: "METRICS",
+        icon: <BarChart3 className="w-4 h-4 text-[#10b981]" />,
+        onSelect: () => onNavigate("scan-dashboard"),
       },
       {
         id: "nav-playground",
