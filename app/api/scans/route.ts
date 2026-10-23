@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { scanStore, computeSha256, analyzeUploadedArtifact } from "@/lib/scanner/scan-adapter";
-import { validateArtifactFile } from "@/lib/scanner/supported-formats";
+import { MAX_FILE_SIZE_BYTES, validateArtifactFile } from "@/lib/scanner/supported-formats";
 import { SYNTHETIC_DEMO_SAMPLES } from "@/lib/scanner/synthetic-samples";
 import { ScanJob } from "@/types/scanner";
+import { extractPdfText } from "@/lib/scanner/pdf-text-extractor";
+import { reviewArtifactWithGemini } from "@/lib/scanner/gemini-artifact-review";
+import { scoreFindings } from "@/lib/scanner/risk-scoring";
 
 export async function GET(req: NextRequest) {
   const scans = scanStore.list();
@@ -11,9 +14,24 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const contentLength = Number(req.headers.get("content-length") || 0);
+    if (contentLength > MAX_FILE_SIZE_BYTES + 1024 * 1024) {
+      return NextResponse.json({ code: "UPLOAD_TOO_LARGE", message: "This upload is over AEGIS’s 10 MB maximum. Choose a smaller file and try again.", stage: "VALIDATION" }, { status: 413 });
+    }
+    let body: Record<string, any>;
+    let uploadedFile: File | undefined;
+    if (req.headers.get("content-type")?.includes("multipart/form-data")) {
+      const form = await req.formData();
+      const candidate = form.get("file");
+      if (candidate && typeof candidate === "object" && "arrayBuffer" in candidate) uploadedFile = candidate as File;
+      body = { geminiReviewEnabled: form.get("geminiReviewEnabled") === "true" };
+    } else {
+      body = await req.json();
+    }
 
-    // 1. Synthetic Demo Sample requested
+    // Synthetic examples run through the same detectors and optional Gemini
+    // review as uploaded artifacts; they are clearly marked in the report.
+    let isDemoData = false;
     if (body.demoSampleId) {
       const sample = SYNTHETIC_DEMO_SAMPLES.find((s) => s.id === body.demoSampleId);
       if (!sample) {
@@ -27,21 +45,14 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Refresh timestamps and persist
-      const cloneJob: ScanJob = {
-        ...sample.job,
-        id: `DEMO-${Date.now().toString(36).toUpperCase()}-${sample.id.slice(-6)}`,
-        createdAt: new Date().toISOString(),
-        completedAt: new Date().toISOString(),
-        isDemoData: true,
-      };
-
-      scanStore.set(cloneJob.id, cloneJob);
-      return NextResponse.json({ scanJob: cloneJob }, { status: 201 });
+      body.fileName = sample.name;
+      body.fileContent = sample.rawContent;
+      isDemoData = true;
     }
 
     // 2. Live Artifact Upload
-    const { fileName, fileContent } = body;
+    const fileName = uploadedFile?.name || body.fileName;
+    const geminiReviewEnabled = body.geminiReviewEnabled;
 
     if (!fileName || typeof fileName !== "string") {
       return NextResponse.json(
@@ -54,7 +65,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (typeof fileContent !== "string") {
+    const isPdf = fileName.toLowerCase().endsWith(".pdf");
+    const earlyValidation = uploadedFile
+      ? validateArtifactFile({ name: fileName, size: uploadedFile.size })
+      : null;
+    if (earlyValidation && !earlyValidation.valid) {
+      return NextResponse.json({ code: "FORMAT_VALIDATION_ERROR", message: earlyValidation.error || "File validation failed.", stage: "VALIDATION" }, { status: 400 });
+    }
+    const fileContent = uploadedFile && !isPdf ? await uploadedFile.text() : body.fileContent;
+    let originalPdf: Buffer | undefined;
+    let scanText = typeof fileContent === "string" ? fileContent : "";
+    let pdfPageCount = 0;
+
+    if (isPdf) {
+      if (uploadedFile) {
+        originalPdf = Buffer.from(await uploadedFile.arrayBuffer());
+      } else if (typeof body.fileBase64 === "string" && /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(body.fileBase64)) {
+        originalPdf = Buffer.from(body.fileBase64, "base64");
+      } else {
+        return NextResponse.json({ code: "INVALID_PDF", message: "Upload the original PDF file bytes so AEGIS can inspect the document safely.", stage: "VALIDATION" }, { status: 400 });
+      }
+      if (originalPdf.length < 8 || originalPdf.subarray(0, 5).toString("ascii") !== "%PDF-") {
+        return NextResponse.json({ code: "INVALID_PDF", message: "The uploaded file does not have a valid PDF header.", stage: "VALIDATION" }, { status: 400 });
+      }
+      const extracted = extractPdfText(originalPdf);
+      scanText = extracted.text;
+      pdfPageCount = extracted.pageCount;
+    } else if (typeof fileContent !== "string") {
       return NextResponse.json(
         {
           code: "INVALID_CONTENT",
@@ -65,7 +102,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const sizeBytes = Buffer.byteLength(fileContent, "utf8");
+    const sizeBytes = originalPdf?.length ?? Buffer.byteLength(scanText, "utf8");
     const validation = validateArtifactFile({ name: fileName, size: sizeBytes });
 
     if (!validation.valid) {
@@ -80,12 +117,40 @@ export async function POST(req: NextRequest) {
     }
 
     // Compute cryptographic SHA-256 hash
-    const sha256 = computeSha256(fileContent);
-    const lineCount = fileContent.split(/\r?\n/).length;
+    const sha256 = computeSha256(originalPdf || scanText);
+    const lineCount = scanText ? scanText.split(/\r?\n/).length : 0;
     const scanId = `SCAN-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     // Execute baseline pattern and syntax scan
-    const analysis = analyzeUploadedArtifact(fileName, fileContent);
+    const analysis = analyzeUploadedArtifact(fileName, scanText);
+    if (isPdf && scanText.length > 0) {
+      analysis.extraction.status = "COMPLETE";
+      analysis.extraction.warnings = [];
+    }
+    if (isPdf && scanText.length === 0) {
+      analysis.extraction.status = "PARTIAL";
+      analysis.extraction.warnings = ["Local PDF text extraction found no readable text. Scanned or compressed content requires Gemini review; upload the original PDF with AI review enabled for visual document analysis."];
+    }
+
+    const aiReview = geminiReviewEnabled === true
+      ? await reviewArtifactWithGemini({ fileName, fileContent: scanText, fileBase64: originalPdf?.toString("base64"), pdfPageCount })
+      : { status: "SKIPPED" as const, message: "Gemini review was turned off for this scan; local pattern checks still ran.", findings: [] };
+
+    const localFindingLocations = new Set(analysis.findings.map((finding) => `${finding.category}:${finding.location.startLine ?? "?"}`));
+    const aiFindings = aiReview.findings.filter((finding) => {
+      const signature = `${finding.category}:${finding.location.startLine ?? "?"}`;
+      return !localFindingLocations.has(signature);
+    });
+    const findings = [...analysis.findings, ...aiFindings].map((finding, index) => ({ ...finding, id: `FND-${scanId}-${index + 1}` }));
+    analysis.coverage.checksCompleted = analysis.coverage.checksCompleted.filter((check) => check.id !== "CHK-008");
+    analysis.coverage.checksSkipped = analysis.coverage.checksSkipped.filter((check) => check.id !== "CHK-008");
+    if (aiReview.status === "COMPLETED") {
+      analysis.coverage.checksCompleted.push({ id: "CHK-008", name: "Gemini AI Threat Review", detector: "Google Gemini" });
+    } else {
+      analysis.coverage.checksSkipped.push({ id: "CHK-008", name: "Gemini AI Threat Review", detector: "Google Gemini", reason: aiReview.message });
+    }
+    analysis.assessment = scoreFindings(findings);
+    analysis.coverage.summary = `${analysis.coverage.checksCompleted.length} checks completed. ${analysis.coverage.checksSkipped.length} skipped. ${findings.length} findings identified.`;
 
     const scanJob: ScanJob = {
       id: scanId,
@@ -94,7 +159,7 @@ export async function POST(req: NextRequest) {
         name: fileName,
         sizeBytes,
         detectedType: validation.capability?.extension.replace(".", "") || "unknown",
-        mimeType: "text/plain",
+        mimeType: isPdf ? "application/pdf" : "text/plain",
         sha256,
         uploadedAt: new Date().toISOString(),
         lineCount,
@@ -105,13 +170,24 @@ export async function POST(req: NextRequest) {
       createdAt: new Date().toISOString(),
       startedAt: new Date().toISOString(),
       completedAt: new Date().toISOString(),
-      isDemoData: false, // Live scan on real uploaded artifact
+      isDemoData,
       extraction: analysis.extraction,
       assessment: analysis.assessment,
       coverage: analysis.coverage,
-      findings: analysis.findings,
-      notes: "Live scan executed against local pattern engine.",
+      aiReview: {
+        provider: "Google Gemini",
+        ...(aiReview.model ? { model: aiReview.model } : {}),
+        status: aiReview.status,
+        message: aiReview.message,
+        findingsAdded: aiFindings.length,
+        ...(aiReview.status === "COMPLETED" ? { analyzedAt: new Date().toISOString() } : {}),
+      },
+      findings,
+      notes: aiReview.status === "COMPLETED"
+        ? `Static checks and Gemini review completed using ${aiReview.model}.`
+        : `Static local checks completed. ${aiReview.message}`,
     };
+    if (isDemoData) scanJob.notes = `DEMO DATASET · ${scanJob.notes || "Synthetic artifact scanned through the live pipeline."}`;
 
     scanStore.set(scanJob.id, scanJob);
 

@@ -9,7 +9,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "SOURCE_CODE",
     description: "TypeScript Source File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "ASTSecurityChecker", "CodeVulnerabilityScanner"],
+    detectorsSupported: ["SecretScanner", "CommandPatternDetector", "CodePatternDetector", "ConfigIntegrityChecker", "EgressPatternDetector"],
     status: "SUPPORTED",
   },
   {
@@ -17,7 +17,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "SOURCE_CODE",
     description: "TypeScript React Source File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "ASTSecurityChecker", "CodeVulnerabilityScanner"],
+    detectorsSupported: ["SecretScanner", "CommandPatternDetector", "CodePatternDetector", "ConfigIntegrityChecker", "EgressPatternDetector"],
     status: "SUPPORTED",
   },
   {
@@ -25,7 +25,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "SOURCE_CODE",
     description: "JavaScript Source File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "ASTSecurityChecker", "CodeVulnerabilityScanner"],
+    detectorsSupported: ["SecretScanner", "CommandPatternDetector", "CodePatternDetector", "ConfigIntegrityChecker", "EgressPatternDetector"],
     status: "SUPPORTED",
   },
   {
@@ -33,7 +33,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "SOURCE_CODE",
     description: "JavaScript React Source File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "ASTSecurityChecker", "CodeVulnerabilityScanner"],
+    detectorsSupported: ["SecretScanner", "CommandPatternDetector", "CodePatternDetector", "ConfigIntegrityChecker", "EgressPatternDetector"],
     status: "SUPPORTED",
   },
   {
@@ -41,7 +41,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "SOURCE_CODE",
     description: "Python Source File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "ASTSecurityChecker", "CodeVulnerabilityScanner"],
+    detectorsSupported: ["SecretScanner", "CommandPatternDetector", "CodePatternDetector", "ConfigIntegrityChecker", "EgressPatternDetector"],
     status: "SUPPORTED",
   },
 
@@ -51,7 +51,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "SCRIPT",
     description: "POSIX Shell Script",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["CommandPatternDetector", "SecretScanner", "SandboxingRuleChecker"],
+    detectorsSupported: ["CommandPatternDetector", "SecretScanner", "EgressPatternDetector"],
     status: "SUPPORTED",
   },
   {
@@ -59,7 +59,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "SCRIPT",
     description: "Bourne Again Shell Script",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["CommandPatternDetector", "SecretScanner", "SandboxingRuleChecker"],
+    detectorsSupported: ["CommandPatternDetector", "SecretScanner", "EgressPatternDetector"],
     status: "SUPPORTED",
   },
   {
@@ -85,7 +85,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "CONFIG",
     description: "JSON Configuration File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "McpPermissionValidator", "ConfigIntegrityChecker"],
+    detectorsSupported: ["SecretScanner", "PermissionAuditor", "ConfigIntegrityChecker"],
     status: "SUPPORTED",
   },
   {
@@ -93,7 +93,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "CONFIG",
     description: "YAML Configuration File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "ConfigIntegrityChecker"],
+    detectorsSupported: ["SecretScanner", "PermissionAuditor", "ConfigIntegrityChecker"],
     status: "SUPPORTED",
   },
   {
@@ -101,7 +101,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "CONFIG",
     description: "YAML Configuration File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "ConfigIntegrityChecker"],
+    detectorsSupported: ["SecretScanner", "PermissionAuditor", "ConfigIntegrityChecker"],
     status: "SUPPORTED",
   },
   {
@@ -109,7 +109,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "CONFIG",
     description: "TOML Configuration File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "ConfigIntegrityChecker"],
+    detectorsSupported: ["SecretScanner", "PermissionAuditor", "ConfigIntegrityChecker"],
     status: "SUPPORTED",
   },
   {
@@ -127,7 +127,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "PROMPT",
     description: "AI Agent Prompt Template",
     maxSizeBytes: 2 * 1024 * 1024,
-    detectorsSupported: ["PromptInjectionDetector", "JailbreakScanner", "SecretScanner"],
+    detectorsSupported: ["PromptInjectionDetector", "SecretScanner", "PermissionAuditor"],
     status: "SUPPORTED",
   },
   {
@@ -135,7 +135,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "SKILL",
     description: "Markdown Document / Agent Skill Instruction",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["PromptInjectionDetector", "SecretScanner", "DocumentContentChecker"],
+    detectorsSupported: ["PromptInjectionDetector", "SecretScanner", "PermissionAuditor"],
     status: "SUPPORTED",
   },
   {
@@ -143,7 +143,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "SKILL",
     description: "Agent Customization Skill Package",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["PromptInjectionDetector", "ToolPermissionAuditor", "SecretScanner"],
+    detectorsSupported: ["PromptInjectionDetector", "PermissionAuditor", "SecretScanner"],
     status: "SUPPORTED",
   },
 
@@ -153,7 +153,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "MCP",
     description: "Model Context Protocol Server Configuration",
     maxSizeBytes: 2 * 1024 * 1024,
-    detectorsSupported: ["McpPermissionValidator", "ToolCapabilityAuditor", "SecretScanner"],
+    detectorsSupported: ["PermissionAuditor", "SecretScanner", "EgressPatternDetector"],
     status: "SUPPORTED",
   },
 
@@ -163,7 +163,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "DEPENDENCY",
     description: "Dependency Lock File",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["DependencyVulnerabilityAuditor"],
+    detectorsSupported: ["SecretScanner", "CommandPatternDetector", "CodePatternDetector"],
     status: "EXPERIMENTAL",
   },
 
@@ -173,7 +173,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "DOCUMENT",
     description: "Plain Text Document",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["SecretScanner", "DocumentContentChecker"],
+    detectorsSupported: ["SecretScanner", "PromptInjectionDetector", "PermissionAuditor"],
     status: "SUPPORTED",
   },
   {
@@ -181,7 +181,7 @@ export const SUPPORTED_FORMATS: SupportedFormatCapability[] = [
     category: "DOCUMENT",
     description: "Portable Document Format",
     maxSizeBytes: MAX_FILE_SIZE_BYTES,
-    detectorsSupported: ["DocumentContentChecker"],
+    detectorsSupported: [],
     status: "EXPERIMENTAL",
   },
 ];
@@ -195,7 +195,7 @@ export function getFormatCapability(fileName: string): SupportedFormatCapability
       category: "MCP",
       description: "Model Context Protocol Server Configuration",
       maxSizeBytes: 2 * 1024 * 1024,
-      detectorsSupported: ["McpPermissionValidator", "ToolCapabilityAuditor", "SecretScanner"],
+      detectorsSupported: ["PermissionAuditor", "SecretScanner", "EgressPatternDetector"],
       status: "SUPPORTED",
     };
   }
@@ -227,7 +227,7 @@ export function validateArtifactFile(file: { name: string; size: number }): {
     const ext = file.name.includes(".") ? `.${file.name.split(".").pop()}` : "unknown";
     return {
       valid: false,
-      error: `Unsupported file format '${ext}'. Supported formats: documents (.txt, .md, .pdf), source code (.ts, .tsx, .js, .py), scripts (.sh, .bash, .ps1), configs (.json, .yaml, .toml, .env), prompts (.prompt, .md), agent skills, and MCP configurations.`,
+      error: `Unsupported file format '${ext}'. Supported extensions: ${SUPPORTED_FORMATS.map((format) => format.extension).join(", ")}.`,
     };
   }
 

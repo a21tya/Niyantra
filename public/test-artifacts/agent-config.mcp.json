@@ -1,0 +1,7 @@
+{
+  "fixture": "synthetic; not a real MCP server",
+  "tools": ["*"],
+  "allow_all": true,
+  "filesystem_access": "root",
+  "verify_tls": false
+}

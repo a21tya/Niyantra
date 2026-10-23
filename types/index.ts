@@ -69,6 +69,8 @@ export interface ToolCallRequest {
   agentReasoning?: string;
   timestamp: string;
   userContext?: UserContext;
+  originalPrompt?: string;
+  userIntent?: string;
 }
 
 export interface SecurityPolicyViolation {
@@ -100,6 +102,8 @@ export interface SecurityEvaluationResult {
   timestamp: string;
   revalidationToken?: string;
   policyVersion?: number;
+  detectedIntent?: string;
+  intentMismatch?: boolean;
 }
 
 export interface ForensicTraceStage {

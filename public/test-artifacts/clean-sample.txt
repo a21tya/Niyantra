@@ -1,0 +1,2 @@
+SAFE TEST FIXTURE
+This sample contains no credentials, unsafe commands, prompt overrides, or broad permissions.

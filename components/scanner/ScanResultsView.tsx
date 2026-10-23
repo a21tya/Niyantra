@@ -17,9 +17,11 @@ import {
   ChevronUp,
   FileCode,
   Share2,
+  Sparkles,
 } from "lucide-react";
 import { ScanJob, Finding } from "@/types/scanner";
 import { scanApiClient } from "@/lib/api/scan-client";
+import { RISK_CATEGORIES } from "@/lib/scanner/risk-scoring";
 
 interface ScanResultsViewProps {
   scanJob: ScanJob;
@@ -36,13 +38,15 @@ export function ScanResultsView({
   const [downloadingFormat, setDownloadingFormat] = useState<string | null>(null);
 
   const assessment = scanJob.assessment;
-  const counts = assessment?.counts || {
-    critical: 0,
-    high: 0,
-    medium: 0,
-    low: 0,
-    informational: 0,
-    total: 0,
+  // The finding list is the source of truth so imported and synthetic reports
+  // cannot display chart totals that disagree with the evidence below.
+  const counts = {
+    critical: scanJob.findings.filter((finding) => finding.severity === "CRITICAL").length,
+    high: scanJob.findings.filter((finding) => finding.severity === "HIGH").length,
+    medium: scanJob.findings.filter((finding) => finding.severity === "MEDIUM").length,
+    low: scanJob.findings.filter((finding) => finding.severity === "LOW").length,
+    informational: scanJob.findings.filter((finding) => finding.severity === "INFORMATIONAL").length,
+    total: scanJob.findings.length,
   };
 
   const handleDownload = async (format: "json" | "sarif" | "markdown") => {
@@ -72,6 +76,27 @@ export function ScanResultsView({
 
   const score = assessment?.score ?? 0;
   const band = assessment?.severityBand ?? "INFORMATIONAL";
+  const severitySegments = [
+    { name: "Critical", count: counts.critical, color: "#f04465" },
+    { name: "High", count: counts.high, color: "#f97316" },
+    { name: "Medium", count: counts.medium, color: "#eab308" },
+    { name: "Low", count: counts.low, color: "#22c55e" },
+    { name: "Info", count: counts.informational, color: "#38bdf8" },
+  ];
+  const categoryCounts = RISK_CATEGORIES.map((category) => ({
+    ...category,
+    count: scanJob.findings.filter((finding) => finding.category === category.id).length,
+  }));
+  const largestCategoryCount = Math.max(1, ...categoryCounts.map((category) => category.count));
+  const gradientStops: string[] = [];
+  let cursor = 0;
+  for (const segment of severitySegments) {
+    if (segment.count === 0 || counts.total === 0) continue;
+    const next = cursor + (segment.count / counts.total) * 100;
+    gradientStops.push(`${segment.color} ${cursor}% ${next}%`);
+    cursor = next;
+  }
+  const severityGradient = gradientStops.length ? `conic-gradient(${gradientStops.join(", ")})` : "#e5e7eb";
 
   const bandColor =
     band === "CRITICAL"
@@ -110,6 +135,13 @@ export function ScanResultsView({
           <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-200/60 text-emerald-900 border border-emerald-300 shrink-0">
             LIVE SCAN
           </span>
+        </div>
+      )}
+
+      {scanJob.aiReview && (
+        <div className={`flex items-start gap-3 rounded-xl border p-4 text-xs ${scanJob.aiReview.status === "COMPLETED" ? "border-violet-200 bg-violet-50 text-violet-950" : scanJob.aiReview.status === "FAILED" ? "border-rose-200 bg-rose-50 text-rose-950" : "border-amber-200 bg-amber-50 text-amber-950"}`}>
+          <Sparkles className={`mt-0.5 h-4 w-4 shrink-0 ${scanJob.aiReview.status === "COMPLETED" ? "text-violet-600" : "text-amber-600"}`} />
+          <div><div className="font-semibold">Gemini review · {scanJob.aiReview.status}{scanJob.aiReview.model ? ` · ${scanJob.aiReview.model}` : ""}{scanJob.aiReview.status === "COMPLETED" ? ` · ${scanJob.aiReview.findingsAdded} AI findings added` : ""}</div><p className="mt-1 leading-relaxed opacity-80">{scanJob.aiReview.message}</p></div>
         </div>
       )}
 
@@ -253,6 +285,48 @@ export function ScanResultsView({
             )}
           </div>
         </div>
+
+        {/* Visual report: all charts reflect this scan's findings. */}
+        <section aria-label="Visual risk report" className="grid gap-5 xl:grid-cols-[0.85fr_1.5fr]">
+          <div className="rounded-2xl border border-[#e5e8e2] bg-gradient-to-br from-[#f7f8ff] via-white to-[#fff8f2] p-5 shadow-soft">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <p className="text-[11px] font-mono font-semibold uppercase tracking-[0.13em] text-[#737b91]">Severity mix</p>
+                <h2 className="mt-1 text-lg font-display font-bold text-[#151827]">Finding distribution</h2>
+              </div>
+              <span className="rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-semibold text-violet-800">{counts.total} signals</span>
+            </div>
+            <div className="mt-5 flex items-center gap-6">
+              <div className="relative grid h-36 w-36 shrink-0 place-items-center rounded-full" style={{ background: severityGradient }} role="img" aria-label={`${counts.total} findings across severity levels`}>
+                <div className="grid h-24 w-24 place-items-center rounded-full bg-white shadow-inner">
+                  <div className="text-center"><div className="text-3xl font-bold tracking-tight text-[#151827]">{score}</div><div className="text-[9px] font-semibold uppercase tracking-wider text-[#85899a]">Risk index</div></div>
+                </div>
+              </div>
+              <div className="min-w-0 flex-1 space-y-2">
+                {severitySegments.map((segment) => <div key={segment.name} className="flex items-center gap-2 text-xs"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: segment.color }} /><span className="text-[#626879]">{segment.name}</span><span className="ml-auto font-mono font-semibold text-[#252a39]">{segment.count}</span></div>)}
+              </div>
+            </div>
+            <p className="mt-5 border-t border-[#e8e9ef] pt-3 text-[10px] leading-relaxed text-[#7b8190]">The index prioritizes review; it is not a probability of breach.</p>
+          </div>
+
+          <div className="rounded-2xl border border-[#e5e8e2] bg-white p-5 shadow-soft">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p className="text-[11px] font-mono font-semibold uppercase tracking-[0.13em] text-[#737b91]">Eight risk categories</p>
+                <h2 className="mt-1 text-lg font-display font-bold text-[#151827]">Where signals were found</h2>
+              </div>
+              <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold ${scanJob.isDemoData ? "bg-amber-50 text-amber-800" : "bg-cyan-50 text-cyan-800"}`}><span className={`h-1.5 w-1.5 rounded-full ${scanJob.isDemoData ? "bg-amber-500" : "animate-pulse bg-cyan-500"}`} /> {scanJob.isDemoData ? "Synthetic sample" : "Live upload data"}</div>
+            </div>
+            <div className="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2">
+              {categoryCounts.map((category) => (
+                <div key={category.id}>
+                  <div className="mb-1.5 flex items-center justify-between gap-3 text-xs"><span className="truncate font-medium text-[#3c4252]">{category.label}</span><span className="font-mono font-bold text-[#282d3b]">{category.count}</span></div>
+                  <div className="h-2 overflow-hidden rounded-full bg-[#f0f1f5]"><div className="h-full min-w-0 rounded-full transition-all duration-500" style={{ width: `${category.count ? Math.max(5, (category.count / largestCategoryCount) * 100) : 0}%`, backgroundColor: category.color, boxShadow: category.count ? `0 0 12px ${category.color}55` : undefined }} /></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* Metadata Details Strip */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#e5e8e2] text-xs font-mono">

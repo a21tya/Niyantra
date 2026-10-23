@@ -35,6 +35,8 @@ export async function POST(req: NextRequest) {
       forceDeterministicDemo,
     });
 
+    proposal.toolCall.originalPrompt = prompt;
+
     // 3. AEGIS Security Gateway Step: Gemini proposes, AEGIS disposes!
     const gatewayResult = await processToolCallThroughGateway(proposal.toolCall);
 

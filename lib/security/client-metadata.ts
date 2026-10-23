@@ -345,6 +345,19 @@ export const POLICY_RULES_CATALOG: Record<string, PolicyRuleDetail> = {
       "Generates SHA-256(id:toolName:args:sessionId:role:userId), locks resolution against race conditions, and re-evaluates active policy on sign-off.",
     configurableParameters: ["autonomousRefundThreshold"],
   },
+  "POL-INTENT-008": {
+    id: "POL-INTENT-008",
+    code: "INTENT_TOOL_MISMATCH / DESTRUCTIVE_INTENT_DETECTED",
+    name: "User Intent & Semantic Alignment Invariant",
+    category: "RBAC",
+    enforcementNature: "DETERMINISTIC_INVARIANT",
+    severity: "CRITICAL",
+    summary:
+      "Prevents destructive and privileged user intents from being silently laundered into harmless read tools like search_documents.",
+    technicalMechanism:
+      "Deterministically classifies prompt intent and cross-checks with proposed tool. Blocks conflicting, destructive, or unsupported requests fail-closed.",
+    configurableParameters: ["Immutable Core Invariant"],
+  },
 };
 
 export type TraceStageStatus = "PASS" | "FAIL" | "HOLD" | "NOT_EVALUATED" | "INFO";

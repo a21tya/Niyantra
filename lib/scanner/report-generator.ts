@@ -31,6 +31,13 @@ export interface VersionedJsonExport {
       checksSkipped: Array<{ id: string; name: string; reason?: string }>;
       checksUnsupported: Array<{ id: string; name: string; reason?: string }>;
     };
+    aiReview?: {
+      provider: string;
+      model?: string;
+      status: string;
+      message: string;
+      findingsAdded: number;
+    };
     findings: Array<{
       id: string;
       ruleId: string;
@@ -97,6 +104,15 @@ export function generateSanitizedJsonExport(job: ScanJob): VersionedJsonExport {
             checksCompleted: job.coverage.checksCompleted,
             checksSkipped: job.coverage.checksSkipped,
             checksUnsupported: job.coverage.checksUnsupported,
+          }
+        : undefined,
+      aiReview: job.aiReview
+        ? {
+            provider: job.aiReview.provider,
+            model: job.aiReview.model,
+            status: job.aiReview.status,
+            message: job.aiReview.message,
+            findingsAdded: job.aiReview.findingsAdded,
           }
         : undefined,
       findings: job.findings.map((f) => ({
@@ -170,6 +186,7 @@ export function generateExecutiveMarkdownReport(job: ScanJob): string {
 | **Artifact SHA-256** | \`${job.artifact.sha256}\` |
 | **File Type & Size** | ${job.artifact.detectedType} (${(job.artifact.sizeBytes / 1024).toFixed(1)} KB, ${job.artifact.lineCount ?? 0} lines) |
 | **Methodology** | ${assessment?.methodologyVersion ?? "AEGIS-RMS-v1.4"} |
+${job.aiReview ? `| **Gemini AI Review** | ${job.aiReview.status}${job.aiReview.model ? ` (${job.aiReview.model})` : ""}; ${job.aiReview.findingsAdded} findings added |` : ""}
 
 > **Security Disclaimer:**  
 > ${assessment?.disclaimer ?? "Assessment represents checks completed by AEGIS."}

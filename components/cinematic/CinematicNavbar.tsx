@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Shield, ArrowRight, Menu, X, Terminal, Lock } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Shield, ArrowRight, Menu, X, Terminal, Sparkles } from "lucide-react";
 
 export function CinematicNavbar({
   onLaunchConsole,
@@ -12,161 +12,51 @@ export function CinematicNavbar({
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 16);
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const links = [
+    ["#hero", "Product"],
+    ["#artifact-analysis", "Artifact scan"],
+    ["#how-it-works", "How it works"],
+    ["#capabilities", "Security"],
+    ["#proof", "Results"],
+  ];
+
   return (
-    <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-[#0b0d11]/85 backdrop-blur-md border-b border-white/[0.08] py-3.5"
-          : "bg-transparent py-5"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-        {/* Brand Logo */}
-        <a href="#hero" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#10b981] to-[#059669] p-0.5 shadow-emerald-glow flex items-center justify-center">
-            <div className="w-full h-full bg-[#0b0d11] rounded-[6px] flex items-center justify-center group-hover:bg-transparent transition-colors">
-              <Shield className="w-4 h-4 text-[#10b981] group-hover:text-white transition-colors" />
-            </div>
-          </div>
-          <div>
-            <div className="font-display font-bold text-base tracking-tight text-white flex items-center gap-2">
-              <span>AEGIS</span>
-              <span className="hidden sm:inline-block text-[9px] font-mono tracking-widest uppercase px-1.5 py-0.5 rounded bg-[#10b981]/15 text-[#34d399] border border-[#10b981]/30">
-                SECURITY GUARD
-              </span>
-            </div>
-          </div>
+    <header className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${scrolled ? "border-violet-100/60 bg-white/95 py-3 shadow-[0_4px_24px_rgba(167,139,250,0.08)] backdrop-blur-xl" : "border-transparent bg-white/70 py-4 backdrop-blur-md"}`}>
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8">
+        <a href="#hero" className="flex items-center gap-2.5 text-neutral-950" aria-label="AEGIS home">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white shadow-[0_4px_12px_rgba(167,139,250,0.35)]"><Shield className="h-[18px] w-[18px]" /></span>
+          <span className="text-xl font-semibold tracking-[-0.05em]">AEGIS</span>
+          <span className="hidden rounded-full border border-violet-200 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-violet-600 lg:inline">AI Security</span>
         </a>
-
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-slate-300">
-          <a
-            href="#problem"
-            className="hover:text-white transition-colors tracking-wide"
-          >
-            The Problem
-          </a>
-          <a
-            href="#how-it-works"
-            className="hover:text-white transition-colors tracking-wide"
-          >
-            How It Works
-          </a>
-          <a
-            href="#capabilities"
-            className="hover:text-white transition-colors tracking-wide"
-          >
-            Capabilities
-          </a>
-          <a
-            href="#interactive-demo"
-            className="hover:text-white transition-colors tracking-wide"
-          >
-            Live Demo
-          </a>
-          <a
-            href="#proof"
-            className="hover:text-white transition-colors tracking-wide"
-          >
-            Evaluation
-          </a>
+        <nav className="hidden items-center gap-8 text-sm font-medium text-neutral-700 lg:flex">
+          {links.map(([href, label]) => <a key={href} href={href} className="transition hover:text-violet-700">{label}</a>)}
         </nav>
-
-        {/* Actions */}
-        <div className="hidden sm:flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onNavigateToDemo}
-            className="px-3.5 py-1.5 rounded-lg border border-white/[0.12] hover:border-white/30 text-xs font-mono text-slate-300 hover:text-white transition-colors"
-          >
-            Try Scenarios
-          </button>
-          <button
-            type="button"
-            onClick={onLaunchConsole}
-            className="px-4 py-1.5 rounded-lg bg-[#10b981] hover:bg-[#059669] text-[#07090b] font-mono text-xs font-bold flex items-center gap-1.5 shadow-emerald-glow transition-all"
-          >
-            <Terminal className="w-3.5 h-3.5" />
-            <span>Launch SOC Console</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+        <div className="hidden items-center gap-3 lg:flex">
+          <button type="button" onClick={onNavigateToDemo} className="px-3 py-2 text-sm font-medium text-neutral-700 transition hover:text-violet-700">Try a scenario</button>
+          <button type="button" onClick={onLaunchConsole} className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-700 to-fuchsia-600 px-5 py-3 text-sm font-medium text-white shadow-[0_7px_20px_rgba(167,139,250,0.3)] transition hover:shadow-[0_10px_28px_rgba(167,139,250,0.4)]">
+            <Terminal className="h-4 w-4" /> Open console <ArrowRight className="h-4 w-4" />
           </button>
         </div>
-
-        {/* Mobile menu toggle */}
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-1.5 rounded-lg border border-white/[0.1] text-slate-300"
-          aria-label="Toggle navigation"
-        >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        <button type="button" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="rounded-full border border-violet-200 p-2 text-neutral-800 lg:hidden" aria-label="Toggle navigation">
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
-
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0d1015] border-b border-white/[0.1] px-6 py-5 space-y-4">
-          <nav className="flex flex-col space-y-3 text-sm text-slate-200">
-            <a
-              href="#problem"
-              onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
-            >
-              The Problem
-            </a>
-            <a
-              href="#how-it-works"
-              onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
-            >
-              How It Works
-            </a>
-            <a
-              href="#capabilities"
-              onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
-            >
-              Capabilities
-            </a>
-            <a
-              href="#interactive-demo"
-              onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
-            >
-              Live Demo
-            </a>
-            <a
-              href="#proof"
-              onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
-            >
-              Evaluation &amp; Proof
-            </a>
-          </nav>
-          <div className="pt-3 border-t border-white/[0.1] flex flex-col gap-2.5">
-            <button
-              type="button"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onLaunchConsole();
-              }}
-              className="w-full py-2.5 rounded-lg bg-[#10b981] text-[#07090b] font-mono text-xs font-bold flex items-center justify-center gap-2"
-            >
-              <Terminal className="w-4 h-4" />
-              <span>Launch SOC Console</span>
-            </button>
-          </div>
+      {mobileMenuOpen && <div className="border-t border-violet-100 bg-white px-6 py-5 shadow-lg lg:hidden">
+        <nav className="flex flex-col gap-4 text-sm text-neutral-800">
+          {links.map(([href, label]) => <a key={href} href={href} onClick={() => setMobileMenuOpen(false)}>{label}</a>)}
+        </nav>
+        <div className="mt-5 flex gap-3">
+          <button type="button" onClick={() => { setMobileMenuOpen(false); onNavigateToDemo(); }} className="rounded-full border border-violet-200 px-4 py-2.5 text-sm">Try a scenario</button>
+          <button type="button" onClick={() => { setMobileMenuOpen(false); onLaunchConsole(); }} className="rounded-full bg-gradient-to-r from-violet-700 to-fuchsia-600 px-4 py-2.5 text-sm text-white">Open console</button>
         </div>
-      )}
+      </div>}
     </header>
   );
 }

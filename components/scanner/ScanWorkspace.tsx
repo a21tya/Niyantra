@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   UploadCloud,
   FileCode,
@@ -28,7 +28,7 @@ import { SYNTHETIC_DEMO_SAMPLES, SyntheticSample } from "@/lib/scanner/synthetic
 import { scanApiClient } from "@/lib/api/scan-client";
 
 interface ScanWorkspaceProps {
-  onScanCompleted: (job: ScanJob) => void;
+  onScanCompleted: (job: ScanJob, batchCount?: number) => void;
   onViewSample: (sample: SyntheticSample) => void;
   isScanning: boolean;
   setIsScanning: (scanning: boolean) => void;
@@ -52,7 +52,18 @@ export function ScanWorkspace({
   const [scanProgress, setScanProgress] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showFormatsModal, setShowFormatsModal] = useState(false);
+  const [geminiReviewEnabled, setGeminiReviewEnabled] = useState(true);
+  const [geminiStatus, setGeminiStatus] = useState<{ configured: boolean; model: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/scans/status")
+      .then((response) => response.json())
+      .then((data) => { if (active) setGeminiStatus({ configured: Boolean(data.geminiConfigured), model: String(data.model || "Gemini") }); })
+      .catch(() => { if (active) setGeminiStatus({ configured: false, model: "Gemini" }); });
+    return () => { active = false; };
+  }, []);
 
   const handleFiles = useCallback(async (files: FileList | File[]) => {
     setErrorMessage(null);
@@ -66,19 +77,9 @@ export function ScanWorkspace({
       const file = files[i];
       const validation = validateArtifactFile({ name: file.name, size: file.size });
 
-      try {
-        const text = await file.text();
-        newItems.push({ file, content: text, validation });
-      } catch (err: any) {
-        newItems.push({
-          file,
-          content: "",
-          validation: {
-            valid: false,
-            error: `Failed to read file '${file.name}': ${err.message}`,
-          },
-        });
-      }
+      // Keep the original File object until submit. This avoids base64 expansion,
+      // unnecessary browser memory copies, and JSON body limits for larger PDFs.
+      newItems.push({ file, content: "", validation });
     }
 
     setSelectedFiles((prev) => [...prev, ...newItems]);
@@ -111,43 +112,36 @@ export function ScanWorkspace({
 
   const handleStartScan = async () => {
     if (selectedFiles.length === 0) return;
-    const target = selectedFiles[0]; // Scan primary queued file
-
-    if (!target.validation.valid) {
-      setErrorMessage(target.validation.error || "Cannot scan invalid file.");
+    const invalidItem = selectedFiles.find((item) => !item.validation.valid);
+    if (invalidItem) {
+      setErrorMessage(`${invalidItem.file.name}: ${invalidItem.validation.error || "Cannot scan invalid file."}`);
       return;
     }
 
     setIsScanning(true);
     setErrorMessage(null);
-    setScanStage("Validating file headers & MIME boundary...");
-    setScanProgress(15);
-
+    let latestJob: ScanJob | null = null;
     try {
-      await new Promise((r) => setTimeout(r, 200));
-      setScanStage("Extracting lines & computing SHA-256 fingerprint...");
-      setScanProgress(45);
-
-      await new Promise((r) => setTimeout(r, 250));
-      setScanStage("Executing static security detectors & pattern checks...");
-      setScanProgress(75);
-
-      const res = await scanApiClient.createScan({
-        fileName: target.file.name,
-        fileContent: target.content,
-      });
-
-      if (!res.success || !res.data) {
-        throw new Error(res.error?.message || "Failed to complete security scan.");
+      for (let index = 0; index < selectedFiles.length; index += 1) {
+        const target = selectedFiles[index];
+        const batchProgress = Math.round((index / selectedFiles.length) * 100);
+        setScanStage(`Scanning ${index + 1} of ${selectedFiles.length}: ${target.file.name}`);
+        setScanProgress(batchProgress);
+        const res = await scanApiClient.createScan({
+          fileName: target.file.name,
+          file: target.file,
+          geminiReviewEnabled,
+        });
+        if (!res.success || !res.data) {
+          throw new Error(res.error?.message || `Failed to scan ${target.file.name}.`);
+        }
+        latestJob = res.data;
       }
-
-      setScanStage("Risk assessment complete.");
+      setScanStage(`Risk assessment complete for ${selectedFiles.length} artifact${selectedFiles.length === 1 ? "" : "s"}.`);
       setScanProgress(100);
       await new Promise((r) => setTimeout(r, 150));
-
-      onScanCompleted(res.data);
-      // Remove scanned file from queue
-      setSelectedFiles((prev) => prev.slice(1));
+      if (latestJob) onScanCompleted(latestJob, selectedFiles.length);
+      setSelectedFiles([]);
     } catch (err: any) {
       setErrorMessage(err.message || "An error occurred during scanning.");
     } finally {
@@ -171,6 +165,7 @@ export function ScanWorkspace({
         fileName: sample.name,
         fileContent: sample.rawContent,
         demoSampleId: sample.id,
+        geminiReviewEnabled,
       });
 
       if (res.success && res.data) {
@@ -197,7 +192,7 @@ export function ScanWorkspace({
             <span>Artifact Scan Workspace</span>
           </h2>
           <p className="text-xs text-[#5c6760] mt-0.5">
-            Upload source code, scripts, configurations, prompts, agent skills, or MCP configs for static security analysis.
+            Upload source, scripts, configs, prompts, skills, MCP files, or PDFs for local checks and optional Gemini threat review.
           </p>
         </div>
 
@@ -209,6 +204,23 @@ export function ScanWorkspace({
           <Info className="w-3.5 h-3.5 text-[#10b981]" />
           <span>Supported Formats & Limits</span>
         </button>
+      </div>
+
+      <div className={`rounded-xl border p-4 ${geminiStatus?.configured && geminiReviewEnabled ? "border-violet-200 bg-violet-50" : "border-amber-200 bg-amber-50"}`}>
+        <label className="flex cursor-pointer items-start gap-3">
+          <input type="checkbox" checked={geminiReviewEnabled} onChange={(event) => setGeminiReviewEnabled(event.target.checked)} className="mt-1 h-4 w-4 accent-violet-600" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold text-[#161925]">Add Gemini AI threat review {geminiStatus?.configured ? `· ${geminiStatus.model}` : "· setup needed"}</span>
+            <span className="mt-1 block text-xs leading-relaxed text-[#5e6270]">
+              {!geminiStatus
+                ? "Checking server-side Gemini setup…"
+                : !geminiStatus.configured
+                  ? "No Gemini API key is configured. Local checks still work. Add GEMINI_API_KEY to .env.local on the server and restart AEGIS to enable AI review."
+                  : "When enabled, this sends the artifact (including original PDF bytes) to Google Gemini. On the free tier, Google may use submitted content to improve its products. Do not send confidential files unless your organization has approved that use. Uncheck for local-only scanning."}
+            </span>
+          </span>
+          <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${geminiStatus?.configured ? "bg-violet-100 text-violet-800" : "bg-amber-100 text-amber-900"}`}>{geminiStatus?.configured ? "AI review" : "Local checks"}</span>
+        </label>
       </div>
 
       {/* Error Banner */}
@@ -247,6 +259,7 @@ export function ScanWorkspace({
           ref={fileInputRef}
           type="file"
           multiple
+          accept={SUPPORTED_FORMATS.map((format) => format.extension).join(",")}
           className="hidden"
           onChange={(e) => {
             if (e.target.files && e.target.files.length > 0) {
@@ -265,7 +278,7 @@ export function ScanWorkspace({
               Drag & drop artifact files here, or <span className="text-[#10b981] underline">browse</span>
             </div>
             <div className="text-xs text-[#79877e] mt-1">
-              Supports .ts, .py, .sh, .json, .yaml, .md, .prompt, MCP configs (max 10MB)
+              {SUPPORTED_FORMATS.map((format) => format.extension).join(", ")} · up to 10 MB (format-specific limits apply)
             </div>
           </div>
 
@@ -277,7 +290,16 @@ export function ScanWorkspace({
             <span>•</span>
             <span>Zero auto-execution</span>
             <span>•</span>
-            <span>Client-side SHA-256</span>
+              <span>SHA-256 fingerprint</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-dashed border-violet-200 bg-gradient-to-r from-violet-50 via-white to-cyan-50 p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div><div className="text-sm font-semibold text-[#202233]">Try safe sample artifacts</div><p className="text-xs text-[#707486]">Synthetic fixtures run through the same scan pipeline as your uploads. Gemini is used only when enabled and configured.</p></div>
+          <div className="flex flex-wrap gap-2 text-xs font-mono">
+            {["aegis-threat-demo.pdf", "prompt-override.prompt", "agent-config.mcp.json", "credential-demo.env", "unsafe-deploy.sh"].map((name) => <a key={name} href={`/test-artifacts/${name}`} download className="rounded-lg border border-white bg-white/90 px-2.5 py-1.5 text-violet-800 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-200">{name}</a>)}
           </div>
         </div>
       </div>
@@ -362,18 +384,18 @@ export function ScanWorkspace({
             <button
               type="button"
               onClick={handleStartScan}
-              disabled={isScanning || selectedFiles.length === 0 || !selectedFiles[0].validation.valid}
+              disabled={isScanning || selectedFiles.length === 0 || selectedFiles.some((item) => !item.validation.valid)}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0e291c] hover:bg-[#153d2c] text-white text-xs font-mono font-semibold shadow-soft disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isScanning ? (
                 <>
                   <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Scanning Artifact...</span>
+                  <span>Scanning {selectedFiles.length} artifact{selectedFiles.length === 1 ? "" : "s"}...</span>
                 </>
               ) : (
                 <>
                   <Play className="w-3.5 h-3.5 text-[#10b981]" />
-                  <span>Run Security Scan</span>
+                  <span>Scan {selectedFiles.length} Artifact{selectedFiles.length === 1 ? "" : "s"}</span>
                 </>
               )}
             </button>
@@ -490,7 +512,7 @@ export function ScanWorkspace({
 
             <div className="p-4 overflow-y-auto space-y-3 text-xs">
               <div className="text-[11px] text-[#5c6760]">
-                Maximum file size per artifact: <strong>10 MB</strong>. All scans run statically in-memory.
+                Maximum file size is 10 MB (some formats have smaller limits). Pattern-based scans run statically; uploaded content is sent to the AEGIS scan API and is never executed.
               </div>
 
               <div className="divide-y divide-[#e5e8e2] border border-[#e5e8e2] rounded-xl overflow-hidden">
@@ -501,7 +523,9 @@ export function ScanWorkspace({
                         {fmt.extension} · {fmt.description}
                       </div>
                       <div className="text-[11px] text-[#79877e] mt-0.5">
-                        Category: {fmt.category} | Detectors: {fmt.detectorsSupported.join(", ")}
+                        Category: {fmt.category} | Pattern checks: {fmt.detectorsSupported.length ? fmt.detectorsSupported.join(", ") : "No reliable text extraction yet"}
+                        {fmt.extension === ".lock" && <span className="block text-amber-700">Dependency advisory database is not connected; this file receives basic text-pattern checks only.</span>}
+                        {fmt.extension === ".pdf" && <span className="block text-amber-700">Local text extraction may miss complex or scanned pages. When enabled, Gemini also reviews the original PDF bytes directly.</span>}
                       </div>
                     </div>
                     <span

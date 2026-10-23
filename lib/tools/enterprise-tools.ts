@@ -4,6 +4,7 @@ import {
   SearchDocumentsArgsSchema,
   SendEmailArgsSchema,
 } from "@/lib/validation/schemas";
+import { UserRole } from "@/types";
 
 // Execution counters to prove execution invariants in tests and audit
 export const toolExecutionCounters: Record<string, number> = {
@@ -67,7 +68,8 @@ export interface ToolExecutionResult {
 
 export async function executeMockTool(
   toolName: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
+  role: UserRole = "guest"
 ): Promise<ToolExecutionResult> {
   const timestamp = new Date().toISOString();
   const executionId = `exec-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
@@ -89,16 +91,27 @@ export async function executeMockTool(
       const { query, document_path } = parsed.data;
 
       if (document_path && FICTIONAL_DOCUMENTS[document_path]) {
+        const document = FICTIONAL_DOCUMENTS[document_path];
+        if (role === "guest" && document.access !== "public") {
+          return {
+            toolName,
+            success: false,
+            error: "Guest access is limited to public documents.",
+            executionId,
+            timestamp,
+          };
+        }
         return {
           toolName,
           success: true,
-          data: FICTIONAL_DOCUMENTS[document_path],
+          data: document,
           executionId,
           timestamp,
         };
       }
 
       const matching = Object.entries(FICTIONAL_DOCUMENTS)
+        .filter(([, doc]) => role !== "guest" || doc.access === "public")
         .filter(([, doc]) => doc.content.toLowerCase().includes(query.toLowerCase()) || doc.title.toLowerCase().includes(query.toLowerCase()))
         .map(([path, doc]) => ({ path, ...doc }));
 

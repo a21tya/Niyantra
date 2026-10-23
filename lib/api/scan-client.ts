@@ -16,7 +16,10 @@ export interface ScanApiResponse<T> {
 
 export interface CreateScanRequest {
   fileName: string;
-  fileContent: string;
+  file?: File;
+  fileContent?: string;
+  fileBase64?: string;
+  geminiReviewEnabled?: boolean;
   isDemo?: boolean;
   demoSampleId?: string;
 }
@@ -191,6 +194,16 @@ export function normalizeScanJob(raw: any): ScanJob {
           summary: String(raw.coverage.summary || ""),
         }
       : undefined,
+    aiReview: raw.aiReview && typeof raw.aiReview === "object"
+      ? {
+          provider: "Google Gemini",
+          model: raw.aiReview.model ? String(raw.aiReview.model) : undefined,
+          status: raw.aiReview.status === "COMPLETED" || raw.aiReview.status === "FAILED" ? raw.aiReview.status : "SKIPPED",
+          message: String(raw.aiReview.message || "Gemini review status unavailable."),
+          findingsAdded: Number(raw.aiReview.findingsAdded || 0),
+          analyzedAt: raw.aiReview.analyzedAt ? String(raw.aiReview.analyzedAt) : undefined,
+        }
+      : undefined,
     findings,
     error: raw.error
       ? {
@@ -255,10 +268,21 @@ export class ScanApiClient {
     headers?: Record<string, string>
   ): Promise<ScanApiResponse<ScanJob>> {
     try {
+      const requestHeaders = { ...headers };
+      let requestBody: BodyInit;
+      if (req.file) {
+        const form = new FormData();
+        form.set("file", req.file, req.file.name);
+        form.set("geminiReviewEnabled", String(Boolean(req.geminiReviewEnabled)));
+        requestBody = form;
+      } else {
+        requestHeaders["Content-Type"] = "application/json";
+        requestBody = JSON.stringify(req);
+      }
       const res = await fetch(this.baseUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...headers },
-        body: JSON.stringify(req),
+        headers: requestHeaders,
+        body: requestBody,
       });
 
       const body = await res.json().catch(() => ({}));

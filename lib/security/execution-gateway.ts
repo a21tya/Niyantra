@@ -47,7 +47,15 @@ export async function processToolCallThroughGateway(
   // 2. Controlled Execution Enforcement
   if (evaluation.decision === "ALLOW") {
     // Permitted: Execute through controlled mock tool executor
-    const rawResult = await executeMockTool(toolCall.toolName, toolCall.arguments);
+    const rawResult = await executeMockTool(
+      toolCall.toolName,
+      toolCall.arguments,
+      toolCall.userContext?.role === "admin" ||
+        toolCall.userContext?.role === "analyst" ||
+        toolCall.userContext?.role === "support_agent"
+        ? toolCall.userContext.role
+        : "guest"
+    );
     executionResult = {
       ...rawResult,
       data: redactSensitiveData(rawResult.data) as Record<string, unknown> | undefined,
@@ -397,7 +405,12 @@ export async function resolveHumanApproval(params: {
     // Permitted to execute now
     const rawResult = await executeMockTool(
       toolCallToCheck.toolName,
-      toolCallToCheck.arguments
+      toolCallToCheck.arguments,
+      toolCallToCheck.userContext?.role === "admin" ||
+        toolCallToCheck.userContext?.role === "analyst" ||
+        toolCallToCheck.userContext?.role === "support_agent"
+        ? toolCallToCheck.userContext.role
+        : "guest"
     );
 
     const executionResult: ToolExecutionResult = {

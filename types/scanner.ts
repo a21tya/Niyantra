@@ -122,6 +122,15 @@ export interface ScanCoverage {
   summary: string;
 }
 
+export interface GeminiArtifactReview {
+  provider: "Google Gemini";
+  model?: string;
+  status: "COMPLETED" | "SKIPPED" | "FAILED";
+  message: string;
+  findingsAdded: number;
+  analyzedAt?: string;
+}
+
 export interface SupportedFormatCapability {
   extension: string;
   category:
@@ -159,6 +168,7 @@ export interface ScanJob {
   extraction?: ExtractionResult;
   assessment?: RiskAssessment;
   coverage?: ScanCoverage;
+  aiReview?: GeminiArtifactReview;
   findings: Finding[];
   error?: ScanError;
   isDemoData: boolean; // true for synthetic samples, false for live scans

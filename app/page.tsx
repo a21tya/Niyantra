@@ -72,12 +72,12 @@ import { SettingsView } from "@/components/views/SettingsView";
 // Cinematic Axonix-inspired Website Sections
 import { CinematicNavbar } from "@/components/cinematic/CinematicNavbar";
 import { HeroSection } from "@/components/cinematic/HeroSection";
-import { ProblemSection } from "@/components/cinematic/ProblemSection";
 import { HowItWorksSection } from "@/components/cinematic/HowItWorksSection";
 import { CapabilitiesSection } from "@/components/cinematic/CapabilitiesSection";
 import { InteractiveDemoSection } from "@/components/cinematic/InteractiveDemoSection";
 import { ProofSection } from "@/components/cinematic/ProofSection";
 import { ClosingSection } from "@/components/cinematic/ClosingSection";
+import { ArtifactAnalysisSection } from "@/components/cinematic/ArtifactAnalysisSection";
 
 const DEMO_PERSONAS = [
   {
@@ -570,10 +570,10 @@ export default function AegisApp() {
   // ==========================================
   if (viewMode === "website") {
     return (
-      <div className="min-h-screen bg-[#080a0d] text-slate-100 flex flex-col font-sans antialiased selection:bg-[#10b981]/25 selection:text-[#34d399]">
+      <div className="aegis-marketing min-h-screen bg-[#fdfcfb] text-neutral-900 flex flex-col font-sans antialiased selection:bg-violet-100 selection:text-violet-900">
         {/* Navigation */}
         <CinematicNavbar
-          onLaunchConsole={() => setViewMode("console")}
+          onLaunchConsole={() => { setActiveTab("scan-workspace"); setViewMode("console"); }}
           onNavigateToDemo={() => {
             const el = document.getElementById("interactive-demo");
             el?.scrollIntoView({ behavior: "smooth" });
@@ -616,25 +616,17 @@ export default function AegisApp() {
 
         {/* Section 1: Hero */}
         <HeroSection
-          onExplore={() => {
-            const el = document.getElementById("problem");
-            el?.scrollIntoView({ behavior: "smooth" });
-          }}
+          onExplore={() => { setActiveTab("scan-workspace"); setViewMode("console"); }}
           onSeeHowItWorks={() => {
             const el = document.getElementById("how-it-works");
             el?.scrollIntoView({ behavior: "smooth" });
           }}
         />
 
-        {/* Section 2: The Problem */}
-        <ProblemSection
-          onSeeHowItWorks={() => {
-            const el = document.getElementById("how-it-works");
-            el?.scrollIntoView({ behavior: "smooth" });
-          }}
-        />
+        {/* Artifact analysis follows the hero. */}
+        <ArtifactAnalysisSection onUpload={() => { setActiveTab("scan-workspace"); setViewMode("console"); }} />
 
-        {/* Section 3: How AEGIS Works (5-Step Sequence) */}
+        {/* Section 2: Meet the AEGIS team */}
         <HowItWorksSection />
 
         {/* Section 4: Security Capabilities */}
@@ -668,7 +660,7 @@ export default function AegisApp() {
 
         {/* Section 7: Closing Statement & Footer */}
         <ClosingSection
-          onLaunchConsole={() => setViewMode("console")}
+          onLaunchConsole={() => { setActiveTab("scan-workspace"); setViewMode("console"); }}
           onNavigateToDemo={() => {
             const el = document.getElementById("interactive-demo");
             el?.scrollIntoView({ behavior: "smooth" });
@@ -729,7 +721,7 @@ export default function AegisApp() {
   return (
     <div className="min-h-screen bg-[#f7f8f5] text-[#111613] flex font-sans antialiased">
       {/* Left Navigation Rail */}
-      <aside className="hidden lg:flex w-60 shrink-0 bg-[#f7f8f5] border-r border-[#e5e8e2] flex-col justify-between p-4 sticky top-0 h-screen select-none">
+      {activeTab !== "scan-results" && <aside className="hidden lg:flex w-60 shrink-0 bg-[#f7f8f5] border-r border-[#e5e8e2] flex-col justify-between p-4 sticky top-0 h-screen select-none">
         <div className="space-y-6">
           {/* Brand Mark with Back to Website shortcut */}
           <div className="flex items-center justify-between pb-2 border-b border-[#e5e8e2]">
@@ -836,12 +828,12 @@ export default function AegisApp() {
             </div>
           </div>
         </div>
-      </aside>
+      </aside>}
 
       {/* Main Console Surface */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Utility Bar */}
-        <header className="sticky top-0 z-30 h-14 bg-[#f7f8f5]/90 backdrop-blur-md border-b border-[#e5e8e2] px-6 flex items-center justify-between gap-4">
+        {activeTab !== "scan-results" && <header className="sticky top-0 z-30 h-14 bg-[#f7f8f5]/90 backdrop-blur-md border-b border-[#e5e8e2] px-6 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 lg:hidden">
             <button
               type="button"
@@ -936,10 +928,10 @@ export default function AegisApp() {
               <ChevronDown className="w-3 h-3 text-[#79877e]" />
             </div>
           </div>
-        </header>
+        </header>}
 
         {/* Global Notification Banner */}
-        {notification && (
+        {notification && activeTab !== "scan-results" && (
           <div
             role="status"
             className={`px-6 py-2.5 text-xs font-mono flex items-center justify-between gap-3 border-b ${
@@ -973,7 +965,7 @@ export default function AegisApp() {
         )}
 
         {/* Viewport */}
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
+        <main className={`flex-1 overflow-y-auto ${activeTab === "scan-results" ? "p-5 sm:p-8 lg:px-12" : "p-6 lg:p-8"}`}>
           {activeTab === "overview" && (
             <SecurityOverview
               events={events}
@@ -1007,13 +999,15 @@ export default function AegisApp() {
             <ScanWorkspace
               isScanning={isScanningArtifact}
               setIsScanning={setIsScanningArtifact}
-              onScanCompleted={(job) => {
+              onScanCompleted={(job, batchCount) => {
                 setCurrentScanJob(job);
                 fetchScansList();
                 setActiveTab("scan-results");
                 setNotification({
                   type: "success",
-                  message: `Artifact scan completed for ${job.artifact.name}. Risk Score: ${job.assessment?.score ?? 0}/100.`,
+                  message: batchCount && batchCount > 1
+                    ? `${batchCount} artifacts scanned. Latest report: ${job.artifact.name}, risk ${job.assessment?.score ?? 0}/100.`
+                    : `Artifact scan completed for ${job.artifact.name}. Risk Score: ${job.assessment?.score ?? 0}/100.`,
                 });
               }}
               onViewSample={(sample) => {
@@ -1024,7 +1018,17 @@ export default function AegisApp() {
           )}
 
           {activeTab === "scan-results" && (
-            <div className="space-y-6">
+            <div className="mx-auto w-full max-w-6xl space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e5e8e2] bg-white px-5 py-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700"><ShieldAlert className="h-5 w-5" /></div>
+                  <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">AEGIS artifact report</p><p className="text-sm text-slate-600">A clear summary of this file’s security review</p></div>
+                </div>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setActiveTab("scan-workspace")} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Scan another file</button>
+                  <button type="button" onClick={() => setViewMode("website")} className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800">Back to website</button>
+                </div>
+              </div>
               {currentScanJob ? (
                 <>
                   <ScanResultsView

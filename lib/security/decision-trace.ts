@@ -18,18 +18,27 @@ export function buildForensicDecisionTrace(params: {
   const { toolCall, evaluation, executionStatus, executionDurationMs = 1 } = params;
   const stages: ForensicTraceStage[] = [];
 
-  // Stage 1: Ingestion & Request Framing
+  // Stage 1: Ingestion & Request Framing (with Intent & User Context Alignment)
+  const hasIntentViolation = evaluation.violations.some(
+    (v) => v.code === "INTENT_TOOL_MISMATCH" || v.code === "DESTRUCTIVE_INTENT_DETECTED"
+  );
   stages.push({
     stageId: "STAGE-1-INGESTION",
     stageName: "Proposal Ingestion & User Context Validation",
-    status: "PASSED",
+    status: hasIntentViolation ? "BLOCKED" : "PASSED",
     durationMs: 0.1,
-    detail: `Caller '${toolCall.userContext?.userId || "unknown"}' (Role: ${
-      toolCall.userContext?.role || "guest"
-    }) proposed tool '${toolCall.toolName}'.`,
+    detail: hasIntentViolation
+      ? evaluation.violations.find(
+          (v) => v.code === "INTENT_TOOL_MISMATCH" || v.code === "DESTRUCTIVE_INTENT_DETECTED"
+        )?.description || "Intent-to-tool mismatch detected."
+      : `Caller '${toolCall.userContext?.userId || "unknown"}' (Role: ${
+          toolCall.userContext?.role || "guest"
+        }) proposed tool '${toolCall.toolName}'.`,
     metadata: {
       sessionId: toolCall.sessionId,
       role: toolCall.userContext?.role || "guest",
+      detectedIntent: evaluation.detectedIntent,
+      intentMismatch: evaluation.intentMismatch,
     },
   });
 

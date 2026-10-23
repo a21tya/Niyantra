@@ -12,6 +12,7 @@ import {
   ENTERPRISE_TOOL_MANIFESTS,
   validateToolArgumentsAgainstManifest,
 } from "@/lib/tools/tool-manifest";
+import { analyzeUserIntent } from "./intent-analyzer";
 import crypto from "crypto";
 
 // Cryptographic HMAC Secret for Approval Tokens (Server-Side Only)
@@ -20,28 +21,20 @@ const AEGIS_HMAC_SECRET =
 
 const VALID_ROLES = new Set<UserRole>(["admin", "analyst", "support_agent", "guest"]);
 
-// Authoritative Role Permitted Tools Table
-const ROLE_PERMITTED_TOOLS: Record<UserRole, string[]> = {
-  admin: [
-    "search_documents",
-    "read_employee_records",
-    "read_payroll_record",
-    "send_email",
-    "send_external_webhook",
-    "execute_refund",
-    "reset_user_credentials",
-  ],
-  analyst: [
-    "search_documents",
-    "read_employee_records",
-    "send_email",
-  ],
-  support_agent: [
-    "search_documents",
-    "send_email",
-    "execute_refund",
-  ],
-  guest: ["search_documents"],
+// Authoritative Role Permitted Tools Table derived directly from ENTERPRISE_TOOL_MANIFESTS
+export const ROLE_PERMITTED_TOOLS: Record<UserRole, string[]> = {
+  admin: Object.values(ENTERPRISE_TOOL_MANIFESTS)
+    .filter((m) => m.allowedRoles.includes("admin"))
+    .map((m) => m.toolName),
+  analyst: Object.values(ENTERPRISE_TOOL_MANIFESTS)
+    .filter((m) => m.allowedRoles.includes("analyst"))
+    .map((m) => m.toolName),
+  support_agent: Object.values(ENTERPRISE_TOOL_MANIFESTS)
+    .filter((m) => m.allowedRoles.includes("support_agent"))
+    .map((m) => m.toolName),
+  guest: Object.values(ENTERPRISE_TOOL_MANIFESTS)
+    .filter((m) => m.allowedRoles.includes("guest"))
+    .map((m) => m.toolName),
 };
 
 /**
@@ -70,6 +63,67 @@ export function evaluateSecurityPolicy(
   // Fail-Safe Least-Privilege Role Default: If missing or unrecognized, default to GUEST
   const rawRole = toolCall.userContext?.role;
   const role: UserRole = rawRole && VALID_ROLES.has(rawRole) ? rawRole : "guest";
+
+  // Extract raw user prompt for intent evaluation
+  const rawPrompt =
+    toolCall.originalPrompt ||
+    (typeof toolCall.arguments.query === "string" ? toolCall.arguments.query : "") ||
+    (typeof toolCall.arguments.rawPrompt === "string" ? toolCall.arguments.rawPrompt : "");
+
+  const intent = analyzeUserIntent(rawPrompt);
+
+  // 0. User Intent & Tool Semantic Alignment Guard (POL-INTENT-008)
+  // "Gemini proposes. AEGIS disposes."
+  // Treat original intent and proposed action as separate inputs. If they conflict, fail closed.
+  if (intent.isDestructive) {
+    violations.push({
+      code: "INTENT_TOOL_MISMATCH",
+      policyId: "POL-INTENT-008",
+      description: `Intent-to-tool mismatch: Destructive user intent ('${intent.summary}') cannot be converted or laundered into read-only tool '${toolCall.toolName}'. Action blocked.`,
+      severity: "CRITICAL",
+    });
+    violations.push({
+      code: "DESTRUCTIVE_INTENT_DETECTED",
+      policyId: "POL-INTENT-008",
+      description: `Destructive operation intercepted: '${intent.summary}'. No database or system deletion capability is supported in this environment.`,
+      severity: "CRITICAL",
+    });
+  } else if (intent.category === "PRIVILEGED_PAYROLL" && toolCall.toolName === "search_documents") {
+    violations.push({
+      code: "INTENT_TOOL_MISMATCH",
+      policyId: "POL-INTENT-008",
+      description: `Privileged payroll inquiry was proposed as generic document search. Direct payroll queries must be evaluated against POL-RBAC-001.`,
+      severity: "CRITICAL",
+    });
+  } else if (intent.category === "PRIVILEGED_FINANCIAL" && toolCall.toolName === "search_documents") {
+    violations.push({
+      code: "INTENT_TOOL_MISMATCH",
+      policyId: "POL-INTENT-008",
+      description: `Financial transaction intent cannot be converted into document search.`,
+      severity: "CRITICAL",
+    });
+  } else if (intent.category === "PRIVILEGED_CREDENTIALS" && toolCall.toolName === "search_documents") {
+    violations.push({
+      code: "INTENT_TOOL_MISMATCH",
+      policyId: "POL-INTENT-008",
+      description: `Administrative credential reset intent cannot be converted into document search.`,
+      severity: "CRITICAL",
+    });
+  } else if (intent.category === "EXPORT_EXFILTRATION" && toolCall.toolName === "search_documents") {
+    violations.push({
+      code: "INTENT_TOOL_MISMATCH",
+      policyId: "POL-INTENT-008",
+      description: `Data export/exfiltration intent cannot be fulfilled via search_documents.`,
+      severity: "CRITICAL",
+    });
+  } else if (intent.category === "UNSUPPORTED_ACTION" && toolCall.toolName === "search_documents") {
+    violations.push({
+      code: "UNSUPPORTED_ACTION",
+      policyId: "POL-RBAC-001",
+      description: `Unsupported action ('${intent.summary}') cannot be converted into document search.`,
+      severity: "CRITICAL",
+    });
+  }
 
   // 1. Tool Capability Manifest & Schema Validation
   const manifest = ENTERPRISE_TOOL_MANIFESTS[toolCall.toolName];
@@ -134,6 +188,18 @@ export function evaluateSecurityPolicy(
     const docPath = normalizeResourcePath(rawDocPath);
     const combined = `${query} ${docPath}`;
 
+    // Guest Role Scoping: Guests can ONLY access public documents
+    if (role === "guest" && rawDocPath) {
+      if (!rawDocPath.toLowerCase().startsWith("public/")) {
+        violations.push({
+          code: "UNAUTHORIZED_RESOURCE_ACCESS",
+          policyId: "POL-RES-002",
+          description: `Role 'guest' is strictly limited to public documents. Access to '${rawDocPath}' is denied.`,
+          severity: "CRITICAL",
+        });
+      }
+    }
+
     // Check for directory traversal & sensitive filesystem probes
     if (
       docPath.includes("..") ||
@@ -185,18 +251,24 @@ export function evaluateSecurityPolicy(
     }
   }
 
-  // 4. Prompt Injection Detection in Reasoning and Arguments
+  // 4. Prompt Injection Detection in Prompt, Reasoning, and Arguments
   const stringifiedArgs = JSON.stringify(toolCall.arguments);
+  const injectionInPrompt = detectPromptInjection(rawPrompt);
   const injectionInArgs = detectPromptInjection(stringifiedArgs);
   const injectionInReasoning = detectPromptInjection(toolCall.agentReasoning || "");
 
-  const allSignals = [...injectionInArgs.signals, ...injectionInReasoning.signals];
+  const allSignals = [
+    ...injectionInPrompt.signals,
+    ...injectionInArgs.signals,
+    ...injectionInReasoning.signals,
+  ];
   for (const sig of allSignals) {
     injectionSignalsDetected.push(`${sig.patternName}: "${sig.matchedText}" (weight: ${sig.weight})`);
   }
 
   const injectionThreshold = config.promptInjectionStrict ? 0.7 : 0.9;
   const highestWeight = Math.max(
+    injectionInPrompt.score,
     injectionInArgs.score,
     injectionInReasoning.score,
     0
@@ -290,6 +362,8 @@ export function evaluateSecurityPolicy(
     timestamp: new Date().toISOString(),
     revalidationToken,
     policyVersion: config.version,
+    detectedIntent: intent.category,
+    intentMismatch: violations.some((v) => v.code === "INTENT_TOOL_MISMATCH"),
   };
 }
 

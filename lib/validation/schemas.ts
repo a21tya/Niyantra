@@ -14,6 +14,8 @@ export const ToolCallRequestSchema = z.object({
   toolName: z.string().min(1),
   arguments: z.record(z.unknown()),
   agentReasoning: z.string().optional(),
+  originalPrompt: z.string().optional(),
+  userIntent: z.string().optional(),
   timestamp: z.string().datetime().optional(),
   userContext: UserContextSchema.optional(),
 });
