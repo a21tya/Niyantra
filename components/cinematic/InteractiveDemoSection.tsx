@@ -57,20 +57,20 @@ export function InteractiveDemoSection({
   };
 
   return (
-    <section id="interactive-demo" className="py-24 bg-[#080a0d] border-t border-white/[0.08] relative">
+    <section id="interactive-demo" className="py-24 bg-[#f7f7f5] border-t border-black/[0.08] relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 space-y-12">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[10px] font-mono tracking-widest uppercase text-[#34d399]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[10px] font-mono tracking-widest uppercase text-[#047857]">
               <Terminal className="w-3.5 h-3.5" />
               <span>LIVE INTERACTION ENGINE</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold tracking-tight text-white leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold tracking-tight text-[#171717] leading-tight">
               Test the security gateway in real time.
             </h2>
-            <p className="text-base text-slate-300 leading-relaxed font-normal">
-              Execute live agent requests against the server-side AEGIS policy engine.
+            <p className="text-base text-[#555] leading-relaxed font-normal">
+              Execute live agent requests against the server-side NIYANTRA policy engine.
               Observe pre-execution interception, physical tool counter locks, and
               HMAC authorization tokens.
             </p>
@@ -79,7 +79,7 @@ export function InteractiveDemoSection({
           <button
             type="button"
             onClick={onOpenConsole}
-            className="px-4 py-2.5 rounded-xl border border-white/[0.12] hover:border-white/30 text-xs font-mono text-slate-200 hover:text-white flex items-center gap-2 shrink-0 transition-colors"
+            className="px-4 py-2.5 rounded-xl border border-black/[0.12] hover:border-black/30 text-xs font-mono text-[#333] hover:text-[#171717] flex items-center gap-2 shrink-0 transition-colors"
           >
             <span>Open Advanced Console</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -91,13 +91,13 @@ export function InteractiveDemoSection({
           {/* Left Column (5 Cols): Scenarios & Controls */}
           <div className="lg:col-span-5 space-y-4">
             {/* Persona Role Selection */}
-            <div className="p-4 rounded-xl bg-[#0e1117] border border-white/[0.08] space-y-2.5">
+            <div className="p-4 rounded-xl bg-white border border-black/[0.08] space-y-2.5">
               <div className="flex items-center justify-between text-[11px] font-mono">
-                <span className="text-slate-400 uppercase font-semibold flex items-center gap-1.5">
+                <span className="text-[#777] uppercase font-semibold flex items-center gap-1.5">
                   <UserCheck className="w-3.5 h-3.5 text-[#10b981]" />
                   <span>Agent Caller Context</span>
                 </span>
-                <span className="text-slate-400">{ROLE_METADATA[selectedRole].clearanceCode}</span>
+                <span className="text-[#777]">{ROLE_METADATA[selectedRole].clearanceCode}</span>
               </div>
               <div className="grid grid-cols-4 gap-1.5">
                 {(["support_agent", "analyst", "admin", "guest"] as UserRole[]).map((r) => (
@@ -109,7 +109,7 @@ export function InteractiveDemoSection({
                     className={`py-1.5 px-2 rounded-lg text-[10px] font-mono font-semibold border transition-all text-center truncate ${
                       selectedRole === r
                         ? "bg-[#10b981] text-[#07090b] border-[#10b981] font-bold"
-                        : "bg-white/[0.03] text-slate-300 border-white/[0.08] hover:border-white/20"
+                        : "bg-black/[0.03] text-[#555] border-black/[0.08] hover:border-black/20"
                     }`}
                   >
                     {r}
@@ -120,7 +120,7 @@ export function InteractiveDemoSection({
 
             {/* Scenario Buttons */}
             <div className="space-y-2.5">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-[#777] font-semibold">
                 CANONICAL ATTACK &amp; COMPLIANCE SCENARIOS
               </div>
               {DEMO_SCENARIOS.map((scn) => {
@@ -133,12 +133,12 @@ export function InteractiveDemoSection({
                     onClick={() => handleSelectScenario(scn.id)}
                     className={`w-full text-left p-3.5 rounded-xl border transition-all group disabled:opacity-50 ${
                       isSelected
-                        ? "bg-[#131922] border-[#10b981] shadow-emerald-glow"
-                        : "bg-[#0e1117] hover:bg-[#121620] border-white/[0.08]"
+                        ? "bg-[#f7f7f5] border-[#10b981] shadow-emerald-glow"
+                        : "bg-white hover:bg-[#f7f7f5] border-black/[0.08]"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <div className="flex items-center gap-1.5 text-[10px] font-mono text-[#34d399] font-bold">
+                      <div className="flex items-center gap-1.5 text-[10px] font-mono text-[#047857] font-bold">
                         <span>{scn.index}.</span>
                         <span>{scn.shortTitle}</span>
                       </div>
@@ -155,11 +155,11 @@ export function InteractiveDemoSection({
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-300 font-medium line-clamp-2">
+                    <p className="text-xs text-[#555] font-medium line-clamp-2">
                       &ldquo;{scn.prompt}&rdquo;
                     </p>
 
-                    <div className="mt-2 pt-1.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] font-mono text-slate-400">
+                    <div className="mt-2 pt-1.5 border-t border-black/[0.06] flex items-center justify-between text-[10px] font-mono text-[#777]">
                       <span>Target: {scn.targetTool}</span>
                       <span className="text-[#10b981] group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-bold">
                         <Play className="w-2.5 h-2.5 fill-current" /> Execute
@@ -171,8 +171,8 @@ export function InteractiveDemoSection({
             </div>
 
             {/* Custom Input prompt */}
-            <div className="p-3.5 rounded-xl bg-[#0e1117] border border-white/[0.08] space-y-2">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold block">
+            <div className="p-3.5 rounded-xl bg-white border border-black/[0.08] space-y-2">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#777] font-bold block">
                 CUSTOM PROMPT PROBE
               </span>
               <div className="flex items-center gap-2">
@@ -186,7 +186,7 @@ export function InteractiveDemoSection({
                     }
                   }}
                   placeholder="Enter custom agent prompt..."
-                  className="flex-1 bg-[#090b0f] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs font-mono text-white placeholder:text-slate-500 focus:outline-none focus:border-[#10b981]"
+                  className="flex-1 bg-white border border-black/[0.1] rounded-lg px-3 py-1.5 text-xs font-mono text-[#171717] placeholder:text-[#888] focus:outline-none focus:border-[#10b981]"
                 />
                 <button
                   type="button"
@@ -201,27 +201,27 @@ export function InteractiveDemoSection({
           </div>
 
           {/* Right Column (7 Cols): Live Gateway Telemetry Display */}
-          <div className="lg:col-span-7 rounded-2xl bg-[#0e1117] border border-white/[0.1] p-6 space-y-6 shadow-card min-h-[500px] flex flex-col justify-between">
+          <div className="lg:col-span-7 rounded-2xl bg-white border border-black/[0.1] p-6 space-y-6 shadow-card min-h-[500px] flex flex-col justify-between">
             <div className="space-y-5">
               {/* Telemetry Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+              <div className="flex items-center justify-between pb-3 border-b border-black/[0.08]">
                 <div className="flex items-center gap-2">
                   <Terminal className="w-4 h-4 text-[#10b981]" />
-                  <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-                    AEGIS GATEWAY DISPOSITION
+                  <span className="text-xs font-mono font-bold text-[#171717] uppercase tracking-wider">
+                    NIYANTRA GATEWAY DISPOSITION
                   </span>
                 </div>
                 {isProcessing ? (
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-mono text-[#34d399] animate-pulse">
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-mono text-[#047857] animate-pulse">
                     <RefreshCw className="w-3 h-3 animate-spin" />
                     INSPECTING STAGES...
                   </span>
                 ) : latestResult ? (
-                  <span className="text-[10px] font-mono text-slate-400">
+                  <span className="text-[10px] font-mono text-[#777]">
                     ID: {latestResult.auditEventId || "evt-live"}
                   </span>
                 ) : (
-                  <span className="text-[10px] font-mono text-slate-400">
+                  <span className="text-[10px] font-mono text-[#777]">
                     STANDBY · SELECT SCENARIO
                   </span>
                 )}
@@ -243,7 +243,7 @@ export function InteractiveDemoSection({
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2.5">
                         <VerdictBadge decision={latestResult.decision} size="md" />
-                        <span className="text-slate-500 font-mono">→</span>
+                        <span className="text-[#888] font-mono">→</span>
                         <ExecutionStatusBadge
                           status={latestResult.executionStatus}
                           size="sm"
@@ -251,7 +251,7 @@ export function InteractiveDemoSection({
                         />
                       </div>
                       <div className="text-right font-mono text-xs">
-                        <span className="text-slate-400 block text-[10px]">RISK FACTOR</span>
+                        <span className="text-[#777] block text-[10px]">RISK FACTOR</span>
                         <span
                           className={`font-bold ${
                             latestResult.securityEvaluation.riskScore >= 0.7
@@ -266,13 +266,13 @@ export function InteractiveDemoSection({
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-100 font-medium leading-relaxed">
+                    <p className="text-xs text-[#171717] font-medium leading-relaxed">
                       {latestResult.securityEvaluation.reason}
                     </p>
 
                     {/* Hard Ground Truth Guarantee */}
                     {latestResult.decision === "BLOCK" && (
-                      <div className="p-3 rounded-lg bg-[#090b0f] border border-rose-500/40 font-mono text-xs flex items-center justify-between text-rose-300">
+                      <div className="p-3 rounded-lg bg-white border border-rose-500/40 font-mono text-xs flex items-center justify-between text-rose-300">
                         <div className="flex items-center gap-2">
                           <ShieldOff className="w-4 h-4 text-rose-400" />
                           <span>Execution Halted Pre-Sink</span>
@@ -284,15 +284,15 @@ export function InteractiveDemoSection({
                     )}
 
                     {latestResult.decision === "REQUIRE_APPROVAL" && (
-                      <div className="p-3 rounded-lg bg-[#090b0f] border border-amber-500/40 font-mono text-xs space-y-1.5 text-amber-300">
+                      <div className="p-3 rounded-lg bg-white border border-amber-500/40 font-mono text-xs space-y-1.5 text-amber-300">
                         <div className="flex items-center justify-between font-bold">
                           <span className="flex items-center gap-2">
                             <Lock className="w-4 h-4 text-amber-400" />
                             <span>Action Paused at Human Gate</span>
                           </span>
-                          <span className="text-[10px] text-slate-400">15m TTL</span>
+                          <span className="text-[10px] text-[#777]">15m TTL</span>
                         </div>
-                        <div className="text-[10px] text-slate-300 truncate">
+                        <div className="text-[10px] text-[#555] truncate">
                           HMAC-SHA256 Token: {latestResult.securityEvaluation.revalidationToken || "GENERATED"}
                         </div>
                       </div>
@@ -301,9 +301,9 @@ export function InteractiveDemoSection({
 
                   {/* Proposed Tool & Arguments */}
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                    <div className="flex items-center justify-between text-[11px] font-mono text-[#777]">
                       <span>PROPOSED TOOL CALL:</span>
-                      <span className="text-white font-bold">
+                      <span className="text-[#171717] font-bold">
                         {latestResult.agentProposal.toolName}()
                       </span>
                     </div>
@@ -319,7 +319,7 @@ export function InteractiveDemoSection({
                   {/* Execution Output or Zero Execution Confirmation */}
                   {latestResult.executionResult && (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                      <div className="flex items-center justify-between text-[11px] font-mono text-[#777]">
                         <span>SANDBOX TOOL SINK RESULT:</span>
                         <span className="text-emerald-400 font-bold">SUCCESS</span>
                       </div>
@@ -335,11 +335,11 @@ export function InteractiveDemoSection({
                 </div>
               ) : (
                 <div className="py-20 text-center space-y-3">
-                  <Shield className="w-10 h-10 text-slate-600 mx-auto" />
-                  <div className="text-sm font-mono text-slate-300">
+                  <Shield className="w-10 h-10 text-[#999] mx-auto" />
+                  <div className="text-sm font-mono text-[#555]">
                     Click any scenario on the left to fire live gateway evaluation
                   </div>
-                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  <p className="text-xs text-[#777] max-w-sm mx-auto">
                     The backend policy engine evaluates RBAC permissions, parameter constraints,
                     injection triggers, and DLP secrets before execution.
                   </p>
@@ -347,7 +347,7 @@ export function InteractiveDemoSection({
               )}
             </div>
 
-            <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono text-slate-400">
+            <div className="pt-3 border-t border-black/[0.08] flex items-center justify-between text-xs font-mono text-[#777]">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-[#10b981]" />
                 Live In-Memory Gateway
@@ -355,7 +355,7 @@ export function InteractiveDemoSection({
               <button
                 type="button"
                 onClick={onOpenConsole}
-                className="text-[#34d399] hover:underline font-bold"
+                className="text-[#047857] hover:underline font-bold"
               >
                 Inspect Full 9-Stage Decision Trace →
               </button>

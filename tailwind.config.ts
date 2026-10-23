@@ -12,6 +12,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: [
+          "Geist",
           "-apple-system",
           "BlinkMacSystemFont",
           '"Segoe UI"',
@@ -21,6 +22,7 @@ const config: Config = {
           "sans-serif",
         ],
         display: [
+          "Geist",
           "-apple-system",
           "BlinkMacSystemFont",
           '"Segoe UI"',
@@ -57,7 +59,7 @@ const config: Config = {
           700: "#242a36",
           600: "#363e4f",
         },
-        aegis: {
+        niyantra: {
           emerald: "#10b981",
           green: "#059669",
           forest: "#0e382b",

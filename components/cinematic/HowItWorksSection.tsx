@@ -19,21 +19,21 @@ export function HowItWorksSection() {
   const [activeMode, setActiveMode] = useState<"ALLOW" | "BLOCK" | "REQUIRE_APPROVAL">("ALLOW");
 
   return (
-    <section id="how-it-works" className="py-24 bg-[#080a0d] border-t border-white/[0.08] relative">
+    <section id="how-it-works" className="py-24 bg-[#f7f7f5] border-t border-black/[0.08] relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 space-y-12">
         {/* Section Header */}
         <div className="max-w-3xl text-left space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[10px] font-mono tracking-widest uppercase text-[#34d399]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[10px] font-mono tracking-widest uppercase text-[#047857]">
             <Shield className="w-3.5 h-3.5" />
-            <span>HOW AEGIS WORKS</span>
+            <span>HOW NIYANTRA WORKS</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold tracking-tight text-white leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold tracking-tight text-[#171717] leading-tight">
             Enforced at the execution boundary.
           </h2>
 
-          <p className="text-base text-slate-300 leading-relaxed font-normal">
-            Autonomous reasoners propose actions. AEGIS evaluates role clearance,
+          <p className="text-base text-[#555] leading-relaxed font-normal">
+            Autonomous reasoners propose actions. NIYANTRA evaluates role clearance,
             scans payloads for injection delimiters and DLP secrets, and cryptographically
             suspends sensitive operations before any enterprise sink can be touched.
           </p>
@@ -41,14 +41,14 @@ export function HowItWorksSection() {
 
         {/* Interactive Mode Toggle */}
         <div className="flex flex-wrap items-center gap-2.5 pt-2">
-          <span className="text-xs font-mono text-slate-400 mr-2">Simulate Outcome:</span>
+          <span className="text-xs font-mono text-[#777] mr-2">Simulate Outcome:</span>
           <button
             type="button"
             onClick={() => setActiveMode("ALLOW")}
             className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all ${
               activeMode === "ALLOW"
                 ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-emerald-glow"
-                : "bg-white/[0.03] text-slate-400 border-white/[0.1] hover:text-white"
+                : "bg-black/[0.03] text-[#777] border-black/[0.1] hover:text-[#171717]"
             }`}
           >
             Scenario A: Legitimate (ALLOW)
@@ -59,7 +59,7 @@ export function HowItWorksSection() {
             className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all ${
               activeMode === "BLOCK"
                 ? "bg-rose-500/20 text-rose-300 border-rose-500/50"
-                : "bg-white/[0.03] text-slate-400 border-white/[0.1] hover:text-white"
+                : "bg-black/[0.03] text-[#777] border-black/[0.1] hover:text-[#171717]"
             }`}
           >
             Scenario B: Injection / Breach (BLOCK)
@@ -70,7 +70,7 @@ export function HowItWorksSection() {
             className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all ${
               activeMode === "REQUIRE_APPROVAL"
                 ? "bg-amber-500/20 text-amber-300 border-amber-500/50"
-                : "bg-white/[0.03] text-slate-400 border-white/[0.1] hover:text-white"
+                : "bg-black/[0.03] text-[#777] border-black/[0.1] hover:text-[#171717]"
             }`}
           >
             Scenario C: High-Value (REQUIRE APPROVAL)
@@ -80,16 +80,16 @@ export function HowItWorksSection() {
         {/* 5-Step Execution Flow Cards with Connecting Arrows */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
           {/* Step 1: Request */}
-          <div className="p-5 rounded-2xl bg-[#0e1117] border border-white/[0.08] flex flex-col justify-between space-y-6 hover:border-white/[0.16] transition-colors relative">
+          <div className="p-5 rounded-2xl bg-white border border-black/[0.08] flex flex-col justify-between space-y-6 hover:border-black/[0.16] transition-colors relative">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="w-6 h-6 rounded-full bg-white/[0.08] text-white font-mono text-xs font-bold flex items-center justify-center">
+                <span className="w-6 h-6 rounded-full bg-black/[0.08] text-[#171717] font-mono text-xs font-bold flex items-center justify-center">
                   1
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 uppercase">INGESTION</span>
+                <span className="text-[10px] font-mono text-[#777] uppercase">INGESTION</span>
               </div>
-              <h3 className="text-sm font-bold text-white">Natural Request</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <h3 className="text-sm font-bold text-[#171717]">Natural Request</h3>
+              <p className="text-xs text-[#777] leading-relaxed">
                 {activeMode === "ALLOW"
                   ? "User asks: 'Check warranty policy for order #991'."
                   : activeMode === "BLOCK"
@@ -97,23 +97,23 @@ export function HowItWorksSection() {
                   : "Support agent requests $750 customer replacement refund."}
               </p>
             </div>
-            <div className="pt-2 border-t border-white/[0.06] flex items-center gap-2 text-[11px] font-mono text-slate-300">
+            <div className="pt-2 border-t border-black/[0.06] flex items-center gap-2 text-[11px] font-mono text-[#555]">
               <User className="w-4 h-4 text-[#10b981]" />
               <span>User / Context</span>
             </div>
           </div>
 
           {/* Step 2: Tool proposal */}
-          <div className="p-5 rounded-2xl bg-[#0e1117] border border-white/[0.08] flex flex-col justify-between space-y-6 hover:border-white/[0.16] transition-colors relative">
+          <div className="p-5 rounded-2xl bg-white border border-black/[0.08] flex flex-col justify-between space-y-6 hover:border-black/[0.16] transition-colors relative">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="w-6 h-6 rounded-full bg-white/[0.08] text-white font-mono text-xs font-bold flex items-center justify-center">
+                <span className="w-6 h-6 rounded-full bg-black/[0.08] text-[#171717] font-mono text-xs font-bold flex items-center justify-center">
                   2
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 uppercase">REASONER</span>
+                <span className="text-[10px] font-mono text-[#777] uppercase">REASONER</span>
               </div>
-              <h3 className="text-sm font-bold text-white">Tool Proposal</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <h3 className="text-sm font-bold text-[#171717]">Tool Proposal</h3>
+              <p className="text-xs text-[#777] leading-relaxed">
                 {activeMode === "ALLOW"
                   ? "Gemini generates tool JSON: search_documents(query='warranty')."
                   : activeMode === "BLOCK"
@@ -121,32 +121,32 @@ export function HowItWorksSection() {
                   : "Model proposes: execute_refund(orderId, amount=750.00)."}
               </p>
             </div>
-            <div className="pt-2 border-t border-white/[0.06] flex items-center gap-2 text-[11px] font-mono text-slate-300">
-              <Sparkles className="w-4 h-4 text-[#34d399]" />
+            <div className="pt-2 border-t border-black/[0.06] flex items-center gap-2 text-[11px] font-mono text-[#555]">
+              <Sparkles className="w-4 h-4 text-[#047857]" />
               <span>AI Agent (Gemini)</span>
             </div>
           </div>
 
-          {/* Step 3: AEGIS Policy Check (THE SECURITY BOUNDARY) */}
-          <div className="p-5 rounded-2xl bg-[#0c2419] border-2 border-[#10b981] flex flex-col justify-between space-y-6 shadow-emerald-glow relative">
+          {/* Step 3: NIYANTRA Policy Check (THE SECURITY BOUNDARY) */}
+          <div className="p-5 rounded-2xl bg-[#e8f5ee] border-2 border-[#10b981] flex flex-col justify-between space-y-6 shadow-emerald-glow relative">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="w-6 h-6 rounded-full bg-[#10b981] text-[#07090b] font-mono text-xs font-bold flex items-center justify-center">
                   3
                 </span>
-                <span className="text-[10px] font-mono font-bold text-[#34d399] uppercase">
+                <span className="text-[10px] font-mono font-bold text-[#047857] uppercase">
                   SECURITY GATE
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                <span>AEGIS Policy Engine</span>
+              <h3 className="text-sm font-bold text-[#171717] flex items-center gap-1.5">
+                <span>NIYANTRA Policy Engine</span>
               </h3>
-              <p className="text-xs text-slate-200 leading-relaxed">
+              <p className="text-xs text-[#333] leading-relaxed">
                 Deterministic pre-execution verification: RBAC matrix, Zod parameter bounds,
                 DLP secret scanner, anti-SSRF allowlist.
               </p>
             </div>
-            <div className="pt-2 border-t border-[#10b981]/30 flex items-center justify-between text-[11px] font-mono text-white">
+            <div className="pt-2 border-t border-[#10b981]/30 flex items-center justify-between text-[11px] font-mono text-[#171717]">
               <div className="flex items-center gap-1.5">
                 <Shield className="w-4 h-4 text-[#10b981]" />
                 <span className="font-bold">Zero Ambient Privilege</span>
@@ -155,22 +155,22 @@ export function HowItWorksSection() {
           </div>
 
           {/* Step 4: Decision */}
-          <div className="p-5 rounded-2xl bg-[#0e1117] border border-white/[0.08] flex flex-col justify-between space-y-6 hover:border-white/[0.16] transition-colors relative">
+          <div className="p-5 rounded-2xl bg-white border border-black/[0.08] flex flex-col justify-between space-y-6 hover:border-black/[0.16] transition-colors relative">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="w-6 h-6 rounded-full bg-white/[0.08] text-white font-mono text-xs font-bold flex items-center justify-center">
+                <span className="w-6 h-6 rounded-full bg-black/[0.08] text-[#171717] font-mono text-xs font-bold flex items-center justify-center">
                   4
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 uppercase">GATE VERDICT</span>
+                <span className="text-[10px] font-mono text-[#777] uppercase">GATE VERDICT</span>
               </div>
-              <h3 className="text-sm font-bold text-white">
+              <h3 className="text-sm font-bold text-[#171717]">
                 {activeMode === "ALLOW"
                   ? "ALLOW: Policy Compliant"
                   : activeMode === "BLOCK"
                   ? "BLOCK: Violation Intercepted"
                   : "REQUIRE_APPROVAL"}
               </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-[#777] leading-relaxed">
                 {activeMode === "ALLOW"
                   ? "Valid role, sanitized arguments, public knowledge base allowed."
                   : activeMode === "BLOCK"
@@ -178,7 +178,7 @@ export function HowItWorksSection() {
                   : "Suspended with HMAC-SHA256 token pending supervisor sign-off."}
               </p>
             </div>
-            <div className="pt-2 border-t border-white/[0.06] flex items-center gap-2 text-[11px] font-mono font-bold">
+            <div className="pt-2 border-t border-black/[0.06] flex items-center gap-2 text-[11px] font-mono font-bold">
               {activeMode === "ALLOW" && (
                 <span className="text-emerald-400 flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4" /> ALLOWED
@@ -201,18 +201,18 @@ export function HowItWorksSection() {
           <div
             className={`p-5 rounded-2xl border flex flex-col justify-between space-y-6 transition-colors relative ${
               activeMode === "ALLOW"
-                ? "bg-[#0b1712] border-emerald-500/40"
+                ? "bg-[#f0f8f2] border-emerald-500/40"
                 : activeMode === "BLOCK"
-                ? "bg-[#180e12] border-rose-500/40"
-                : "bg-[#19150e] border-amber-500/40"
+                ? "bg-[#fff4f3] border-rose-500/40"
+                : "bg-[#fff9ed] border-amber-500/40"
             }`}
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="w-6 h-6 rounded-full bg-white/[0.08] text-white font-mono text-xs font-bold flex items-center justify-center">
+                <span className="w-6 h-6 rounded-full bg-black/[0.08] text-[#171717] font-mono text-xs font-bold flex items-center justify-center">
                   5
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 uppercase">
+                <span className="text-[10px] font-mono text-[#777] uppercase">
                   {activeMode === "ALLOW"
                     ? "SINK EXECUTION"
                     : activeMode === "BLOCK"
@@ -220,14 +220,14 @@ export function HowItWorksSection() {
                     : "MUTEX LOCK"}
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-white">
+              <h3 className="text-sm font-bold text-[#171717]">
                 {activeMode === "ALLOW"
                   ? "Safe Sink Execution"
                   : activeMode === "BLOCK"
                   ? "Underlying Tool NOT Called"
                   : "Awaiting Human Sign-off"}
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-[#555] leading-relaxed">
                 {activeMode === "ALLOW"
                   ? "Tool runs in sandbox. Result returned to user and logged to immutable audit ledger."
                   : activeMode === "BLOCK"
@@ -235,8 +235,8 @@ export function HowItWorksSection() {
                   : "Serialized with mutex lock. Validated via crypto.timingSafeEqual before release."}
               </p>
             </div>
-            <div className="pt-2 border-t border-white/[0.1] flex items-center justify-between text-[11px] font-mono">
-              <div className="flex items-center gap-1.5 text-slate-200">
+            <div className="pt-2 border-t border-black/[0.1] flex items-center justify-between text-[11px] font-mono">
+              <div className="flex items-center gap-1.5 text-[#333]">
                 <Database className="w-4 h-4 text-[#10b981]" />
                 <span>Audit Ledger</span>
               </div>

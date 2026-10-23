@@ -32,11 +32,12 @@ export function CinematicNavbar({
       <div className="max-w-[1296px] mx-auto px-6 flex items-center justify-between">
         {/* Brand Logo */}
         <a href="#hero" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#10b981] to-[#059669] p-0.5 shadow-emerald-glow flex items-center justify-center">
-            <div className="w-full h-full bg-[#111] rounded-[6px] flex items-center justify-center group-hover:bg-transparent transition-colors">
+          <div className="w-8 h-8 rounded-lg bg-[#111] p-0.5 flex items-center justify-center">
+            <div className="w-full h-full bg-[#111] rounded-[6px] flex items-center justify-center group-hover:bg-[#252525] transition-colors">
               <Shield className="w-4 h-4 text-white transition-colors" />
             </div>
           </div>
+          <div>
             <div className="font-display font-bold text-base tracking-tight text-[#121212] flex items-center gap-2">
               <span>NIYANTRA</span>
               <span className="hidden sm:inline-block text-[9px] font-mono tracking-widest uppercase px-1.5 py-0.5 rounded bg-black/[0.04] text-[#555] border border-black/[0.08]">
@@ -47,7 +48,7 @@ export function CinematicNavbar({
         </a>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-[#555]">
+        <nav className="hidden lg:flex items-center gap-7 text-xs font-medium text-[#555]">
           <a
             href="#problem"
             className="hover:text-black transition-colors tracking-wide"
@@ -81,11 +82,11 @@ export function CinematicNavbar({
         </nav>
 
         {/* Actions */}
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3">
           <button
             type="button"
             onClick={onNavigateToDemo}
-            className="px-3.5 py-1.5 rounded-lg border border-white/[0.12] hover:border-white/30 text-xs font-mono text-slate-300 hover:text-white transition-colors"
+            className="px-3.5 py-1.5 rounded-lg border border-black/[0.12] hover:border-black/30 text-xs font-mono text-[#454545] hover:text-black transition-colors"
           >
             Try Scenarios
           </button>
@@ -104,7 +105,7 @@ export function CinematicNavbar({
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-1.5 rounded-lg border border-black/[0.1] text-[#333]"
+          className="lg:hidden p-1.5 rounded-lg border border-black/[0.1] text-[#333]"
           aria-label="Toggle navigation"
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -113,7 +114,7 @@ export function CinematicNavbar({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-black/[0.1] px-6 py-5 space-y-4">
+        <div className="lg:hidden bg-white border-b border-black/[0.1] px-6 py-5 space-y-4">
           <nav className="flex flex-col space-y-3 text-sm text-[#333]">
             <a
               href="#problem"
@@ -158,7 +159,7 @@ export function CinematicNavbar({
                 setMobileMenuOpen(false);
                 onLaunchConsole();
               }}
-              className="w-full py-2.5 rounded-lg bg-[#10b981] text-[#07090b] font-mono text-xs font-bold flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-lg bg-[#111] text-white font-mono text-xs font-bold flex items-center justify-center gap-2"
             >
               <Terminal className="w-4 h-4" />
               <span>Launch SOC Console</span>
