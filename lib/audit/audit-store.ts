@@ -1,5 +1,6 @@
 import { ApprovalRequest, AuditEvent, SecurityDecision, UserRole } from "@/types";
 import { INITIAL_AUDIT_EVENTS } from "@/lib/data/mock-data";
+import { redactSensitiveData } from "@/lib/security/dlp-scanner";
 
 class AuditStore {
   private events: AuditEvent[] = [...INITIAL_AUDIT_EVENTS];
@@ -38,8 +39,13 @@ class AuditStore {
   }
 
   public recordEvent(event: AuditEvent): void {
+    const sanitizedEvent: AuditEvent = {
+      ...event,
+      arguments: (redactSensitiveData(event.arguments) as Record<string, unknown>) || {},
+      executionOutput: redactSensitiveData(event.executionOutput),
+    };
     // Prepend so latest events appear first
-    this.events.unshift(event);
+    this.events.unshift(sanitizedEvent);
   }
 
   public getEvents(filter?: {
@@ -48,9 +54,17 @@ class AuditStore {
     role?: UserRole;
     search?: string;
     limit?: number;
+    sessionId?: string;
+    userId?: string;
   }): { events: AuditEvent[]; total: number } {
     let result = [...this.events];
 
+    if (filter?.sessionId) {
+      result = result.filter((e) => e.sessionId === filter.sessionId);
+    }
+    if (filter?.userId) {
+      result = result.filter((e) => e.userId === filter.userId);
+    }
     if (filter?.toolName) {
       result = result.filter((e) => e.toolName === filter.toolName);
     }
@@ -86,6 +100,12 @@ class AuditStore {
     return Array.from(this.pendingApprovals.values()).filter((a) => a.status === "PENDING");
   }
 
+  public getAllApprovals(): ApprovalRequest[] {
+    return Array.from(this.pendingApprovals.values()).sort(
+      (a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
+    );
+  }
+
   public getApproval(requestId: string): ApprovalRequest | undefined {
     return this.pendingApprovals.get(requestId);
   }
@@ -115,9 +135,51 @@ class AuditStore {
     }
   }
 
+  private activeResolutions: Set<string> = new Set();
+
+  public acquireResolutionLock(requestId: string): boolean {
+    const pending = this.pendingApprovals.get(requestId);
+    if (!pending || pending.status !== "PENDING") {
+      return false;
+    }
+    if (this.activeResolutions.has(requestId)) {
+      return false; // Concurrency collision intercepted
+    }
+    this.activeResolutions.add(requestId);
+    return true;
+  }
+
+  public releaseResolutionLock(requestId: string): void {
+    this.activeResolutions.delete(requestId);
+  }
+
+  public invalidatePendingApprovals(
+    evaluator: (appr: ApprovalRequest) => { shouldInvalidate: boolean; reason: string }
+  ): ApprovalRequest[] {
+    const invalidated: ApprovalRequest[] = [];
+    for (const [id, appr] of this.pendingApprovals.entries()) {
+      if (appr.status === "PENDING") {
+        const check = evaluator(appr);
+        if (check.shouldInvalidate) {
+          appr.status = "REJECTED";
+          appr.resolvedAt = new Date().toISOString();
+          appr.resolvedBy = "SYSTEM_POLICY_TIGHTENING";
+          appr.resolutionNote = `Invalidated by active policy update: ${check.reason}`;
+          this.pendingApprovals.set(id, appr);
+          this.updateEventExecutionStatus(id, "NOT_EXECUTED", {
+            invalidatedByPolicy: check.reason,
+          });
+          invalidated.push(appr);
+        }
+      }
+    }
+    return invalidated;
+  }
+
   public clear(): void {
     this.events = [];
     this.pendingApprovals.clear();
+    this.activeResolutions.clear();
   }
 }
 

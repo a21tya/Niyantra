@@ -32,13 +32,15 @@ export async function generateAgentProposal(params: {
   scenario?: ScenarioType;
   userRole?: UserRole;
   userId?: string;
+  sessionId?: string;
+  assignedEmployeeId?: string;
   forceDeterministicDemo?: boolean;
 }): Promise<AgentProposalResult> {
   const apiKey = process.env.GEMINI_API_KEY;
   const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
   const userRole = params.userRole || "support_agent";
   const userId = params.userId || "user-session-01";
-  const sessionId = `sess-${Date.now().toString(36)}`;
+  const sessionId = params.sessionId || `sess-${Date.now().toString(36)}`;
   const callId = `call-${Date.now().toString(36)}`;
 
   // If deterministic scenario requested or Gemini API Key missing or forced demo mode
@@ -50,6 +52,7 @@ export async function generateAgentProposal(params: {
       userId,
       sessionId,
       callId,
+      assignedEmployeeId: params.assignedEmployeeId,
       reasonKey: !apiKey ? "GEMINI_API_KEY not configured in environment" : undefined,
     });
     return demoProposal;
@@ -96,6 +99,8 @@ export async function generateAgentProposal(params: {
       userContext: {
         userId,
         role: userRole,
+        assignedEmployeeId: params.assignedEmployeeId,
+        sessionId,
       },
     };
 
@@ -114,6 +119,7 @@ export async function generateAgentProposal(params: {
       userId,
       sessionId,
       callId,
+      assignedEmployeeId: params.assignedEmployeeId,
       reasonKey: `Gemini Provider Error: ${error.message || error}`,
     });
 
@@ -132,9 +138,10 @@ function generateDeterministicProposal(params: {
   userId: string;
   sessionId: string;
   callId: string;
+  assignedEmployeeId?: string;
   reasonKey?: string;
 }): AgentProposalResult {
-  const { prompt, scenario, userRole, userId, sessionId, callId, reasonKey } = params;
+  const { prompt, scenario, userRole, userId, sessionId, callId, assignedEmployeeId, reasonKey } = params;
 
   let toolName = "search_documents";
   let args: Record<string, unknown> = { query: prompt };
@@ -196,9 +203,11 @@ function generateDeterministicProposal(params: {
       reasoning = "Identified request to send external message.";
     } else if (lower.includes("refund")) {
       toolName = "execute_refund";
+      const amountMatch = prompt.match(/\$(\d+(\.\d+)?)/);
+      const parsedAmount = amountMatch ? parseFloat(amountMatch[1]) : 350.0;
       args = {
         orderId: "ORD-1002",
-        amount: 350.0,
+        amount: parsedAmount,
         currency: "USD",
         reason: "Customer dissatisfaction",
       };
@@ -220,6 +229,8 @@ function generateDeterministicProposal(params: {
     userContext: {
       userId,
       role: userRole,
+      assignedEmployeeId,
+      sessionId,
     },
   };
 
