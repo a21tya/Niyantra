@@ -101,3 +101,7 @@ export interface SecurityPolicy {
   enabled: boolean;
   type: "RBAC" | "DLP" | "INJECTION" | "APPROVAL" | "DESTINATION";
 }
+
+// Re-export Static Analysis Types for Milestone 9
+export * from "../lib/analysis/types";
+

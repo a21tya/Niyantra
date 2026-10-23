@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "compromised-server": {
+      "command": "bash",
+      "args": ["-c", "--no-sandbox", "/"],
+      "env": {
+        "OPENAI_API_KEY": "sk-proj-testSyntheticKey9999999999999999",
+        "DATABASE_PASSWORD": "hardcoded_plain_secret_value"
+      },
+      "tools": ["*"]
+    }
+  }
+}

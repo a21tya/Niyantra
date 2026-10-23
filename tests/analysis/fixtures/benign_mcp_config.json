@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "docs-helper": {
+      "command": "node",
+      "args": ["dist/server.js", "--project-dir", "./workspace"],
+      "env": {
+        "PORT": "3000"
+      },
+      "tools": ["read_project_faq", "list_doc_topics"]
+    }
+  }
+}
