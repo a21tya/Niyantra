@@ -25,22 +25,21 @@ export function CinematicNavbar({
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[#0b0d11]/85 backdrop-blur-md border-b border-white/[0.08] py-3.5"
-          : "bg-transparent py-5"
+          ? "bg-white/90 backdrop-blur-md border-b border-black/[0.06] py-3.5"
+          : "bg-white/90 py-[28px]"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
+      <div className="max-w-[1296px] mx-auto px-6 flex items-center justify-between">
         {/* Brand Logo */}
         <a href="#hero" className="flex items-center gap-3 group">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#10b981] to-[#059669] p-0.5 shadow-emerald-glow flex items-center justify-center">
-            <div className="w-full h-full bg-[#0b0d11] rounded-[6px] flex items-center justify-center group-hover:bg-transparent transition-colors">
-              <Shield className="w-4 h-4 text-[#10b981] group-hover:text-white transition-colors" />
+            <div className="w-full h-full bg-[#111] rounded-[6px] flex items-center justify-center group-hover:bg-transparent transition-colors">
+              <Shield className="w-4 h-4 text-white transition-colors" />
             </div>
           </div>
-          <div>
-            <div className="font-display font-bold text-base tracking-tight text-white flex items-center gap-2">
-              <span>AEGIS</span>
-              <span className="hidden sm:inline-block text-[9px] font-mono tracking-widest uppercase px-1.5 py-0.5 rounded bg-[#10b981]/15 text-[#34d399] border border-[#10b981]/30">
+            <div className="font-display font-bold text-base tracking-tight text-[#121212] flex items-center gap-2">
+              <span>NIYANTRA</span>
+              <span className="hidden sm:inline-block text-[9px] font-mono tracking-widest uppercase px-1.5 py-0.5 rounded bg-black/[0.04] text-[#555] border border-black/[0.08]">
                 SECURITY GUARD
               </span>
             </div>
@@ -48,34 +47,34 @@ export function CinematicNavbar({
         </a>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-slate-300">
+        <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-[#555]">
           <a
             href="#problem"
-            className="hover:text-white transition-colors tracking-wide"
+            className="hover:text-black transition-colors tracking-wide"
           >
             The Problem
           </a>
           <a
             href="#how-it-works"
-            className="hover:text-white transition-colors tracking-wide"
+            className="hover:text-black transition-colors tracking-wide"
           >
             How It Works
           </a>
           <a
             href="#capabilities"
-            className="hover:text-white transition-colors tracking-wide"
+            className="hover:text-black transition-colors tracking-wide"
           >
             Capabilities
           </a>
           <a
             href="#interactive-demo"
-            className="hover:text-white transition-colors tracking-wide"
+            className="hover:text-black transition-colors tracking-wide"
           >
             Live Demo
           </a>
           <a
             href="#proof"
-            className="hover:text-white transition-colors tracking-wide"
+            className="hover:text-black transition-colors tracking-wide"
           >
             Evaluation
           </a>
@@ -93,7 +92,7 @@ export function CinematicNavbar({
           <button
             type="button"
             onClick={onLaunchConsole}
-            className="px-4 py-1.5 rounded-lg bg-[#10b981] hover:bg-[#059669] text-[#07090b] font-mono text-xs font-bold flex items-center gap-1.5 shadow-emerald-glow transition-all"
+            className="px-4 py-2.5 rounded-full bg-[#111] hover:bg-[#333] text-white font-mono text-xs font-bold flex items-center gap-1.5 transition-all"
           >
             <Terminal className="w-3.5 h-3.5" />
             <span>Launch SOC Console</span>
@@ -105,7 +104,7 @@ export function CinematicNavbar({
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-1.5 rounded-lg border border-white/[0.1] text-slate-300"
+          className="md:hidden p-1.5 rounded-lg border border-black/[0.1] text-[#333]"
           aria-label="Toggle navigation"
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -114,40 +113,40 @@ export function CinematicNavbar({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0d1015] border-b border-white/[0.1] px-6 py-5 space-y-4">
-          <nav className="flex flex-col space-y-3 text-sm text-slate-200">
+        <div className="md:hidden bg-white border-b border-black/[0.1] px-6 py-5 space-y-4">
+          <nav className="flex flex-col space-y-3 text-sm text-[#333]">
             <a
               href="#problem"
               onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
+              className="hover:text-black"
             >
               The Problem
             </a>
             <a
               href="#how-it-works"
               onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
+              className="hover:text-black"
             >
               How It Works
             </a>
             <a
               href="#capabilities"
               onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
+              className="hover:text-black"
             >
               Capabilities
             </a>
             <a
               href="#interactive-demo"
               onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
+              className="hover:text-black"
             >
               Live Demo
             </a>
             <a
               href="#proof"
               onClick={() => setMobileMenuOpen(false)}
-              className="hover:text-[#10b981]"
+              className="hover:text-black"
             >
               Evaluation &amp; Proof
             </a>

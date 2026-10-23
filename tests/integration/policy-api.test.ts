@@ -13,7 +13,7 @@ describe("AEGIS Policy Center Server APIs (Fail-Closed & Audit-Verified)", () =>
   });
 
   it("GET /api/policies returns active configuration and active policy metadata", async () => {
-    const res = await getPolicies();
+    const res = await getPolicies(new NextRequest("http://localhost:3000/api/policies"));
     expect(res.status).toBe(200);
 
     const data = await res.json();
@@ -54,7 +54,7 @@ describe("AEGIS Policy Center Server APIs (Fail-Closed & Audit-Verified)", () =>
     const changeEvent = events.find((e) => e.eventType === "POLICY_CONFIGURATION_CHANGE");
     expect(changeEvent).toBeDefined();
     expect(changeEvent?.policyVersion).toBe(data.config.version);
-    expect(changeEvent?.arguments.newConfig.autonomousRefundThreshold).toBe(750.0);
+    expect((changeEvent?.arguments.newConfig as any)?.autonomousRefundThreshold).toBe(750.0);
   });
 
   it("POST /api/policies rejects non-admin users with 403 Forbidden", async () => {

@@ -232,3 +232,6 @@ export interface EvaluationSuiteResult {
 
 export * from "./scanner";
 
+// Milestone 8 Ingestion & Scan Lifecycle Contract
+export * from "@/lib/ingestion/contract";
+
