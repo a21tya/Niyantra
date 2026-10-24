@@ -3,7 +3,7 @@
  * Deterministic semantic classifier for user prompts to enforce intent-to-tool alignment
  * and prevent destructive actions from being silently converted into harmless read operations.
  *
- * Core Principle: "Gemini proposes. AEGIS disposes."
+ * Core Principle: "Gemini proposes. NIYANTRA disposes."
  * The user's original intent and the proposed tool must be authorized independently.
  */
 

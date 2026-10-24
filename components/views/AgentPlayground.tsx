@@ -415,7 +415,7 @@ export function AgentPlayground({
                   <p className="text-xs text-slate-400 leading-relaxed">
                     Select any of the 5 preset scenarios on the left, click{" "}
                     <strong className="text-[#14f1d9]">Run All 5 Scenarios</strong>, or submit a
-                    custom prompt to inspect how AEGIS evaluates the agent’s proposed tool call.
+                    custom prompt to inspect how NIYANTRA evaluates the agent’s proposed tool call.
                   </p>
                 </div>
 

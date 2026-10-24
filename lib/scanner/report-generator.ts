@@ -74,7 +74,7 @@ export function generateSanitizedJsonExport(job: ScanJob): VersionedJsonExport {
   return {
     schemaVersion: "1.0.0",
     exportedAt: new Date().toISOString(),
-    product: "AEGIS Artifact Security Guard (CY-03)",
+    product: "NIYANTRA Artifact Security Guard (CY-03)",
     environment: job.isDemoData ? "DEMO_SYNTHETIC" : "LIVE_INSPECTION",
     scanJob: {
       id: job.id,
@@ -168,7 +168,7 @@ export function generateExecutiveMarkdownReport(job: ScanJob): string {
     INFORMATIONAL: job.findings.filter((f) => f.severity === "INFORMATIONAL"),
   };
 
-  return `# AEGIS Security Assessment Report
+  return `# NIYANTRA Security Assessment Report
 **Artifact:** \`${job.artifact.name}\`  
 **Scan Identifier:** \`${job.id}\`  
 **Generated At:** ${timestamp}  
@@ -185,11 +185,11 @@ export function generateExecutiveMarkdownReport(job: ScanJob): string {
 | **Total Findings** | **${counts.total}** (Critical: ${counts.critical}, High: ${counts.high}, Medium: ${counts.medium}, Low: ${counts.low}) |
 | **Artifact SHA-256** | \`${job.artifact.sha256}\` |
 | **File Type & Size** | ${job.artifact.detectedType} (${(job.artifact.sizeBytes / 1024).toFixed(1)} KB, ${job.artifact.lineCount ?? 0} lines) |
-| **Methodology** | ${assessment?.methodologyVersion ?? "AEGIS-RMS-v1.4"} |
+| **Methodology** | ${assessment?.methodologyVersion ?? "NIYANTRA-RMS-v1.4"} |
 ${job.aiReview ? `| **Gemini AI Review** | ${job.aiReview.status}${job.aiReview.model ? ` (${job.aiReview.model})` : ""}; ${job.aiReview.findingsAdded} findings added |` : ""}
 
 > **Security Disclaimer:**  
-> ${assessment?.disclaimer ?? "Assessment represents checks completed by AEGIS."}
+> ${assessment?.disclaimer ?? "Assessment represents checks completed by NIYANTRA."}
 
 ---
 
@@ -252,7 +252,7 @@ ${f.remediation.verificationSteps.map((s) => `1. ${s}`).join("\n")}
 ## 4. Operational Boundaries & Disclaimers
 
 1. **Static Analysis Limitations:** Static artifact analysis verifies code, configuration, and prompt patterns at rest. It does not replace dynamic runtime monitoring or sandbox execution.
-2. **Auto-Fix Notice (Zero Auto-Mutation Guarantee):** AEGIS provides strict remediation guidance and safe example diffs; it never automatically modifies or executes uploaded artifacts without explicit human authorization.
+2. **Auto-Fix Notice (Zero Auto-Mutation Guarantee):** NIYANTRA provides strict remediation guidance and safe example diffs; it never automatically modifies or executes uploaded artifacts without explicit human authorization.
 3. **Redaction Guarantee:** All exported secrets and credentials in this report have been redacted to prevent secondary disclosure.
 `;
 }

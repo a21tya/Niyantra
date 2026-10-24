@@ -54,7 +54,7 @@ export function scoreFindings(findings: Finding[]): Pick<RiskAssessment, "score"
     severityBand,
     counts,
     categoryScores,
-    methodologyVersion: "AEGIS-RMS-v2.0",
-    disclaimer: "The AEGIS Risk Index is a prioritization score, not a probability of breach. It combines severity-weighted, confidence-adjusted findings; multiple signals accumulate with diminishing returns. It covers completed checks only—skipped or unsupported checks remain unknown.",
+    methodologyVersion: "NIYANTRA-RMS-v2.0",
+    disclaimer: "The NIYANTRA Risk Index is a prioritization score, not a probability of breach. It combines severity-weighted, confidence-adjusted findings; multiple signals accumulate with diminishing returns. It covers completed checks only—skipped or unsupported checks remain unknown.",
   };
 }

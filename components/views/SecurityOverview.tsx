@@ -381,7 +381,7 @@ export function SecurityOverview({
                     Gemini proposes.
                   </div>
                   <div className="text-xs font-mono font-bold text-[#0e291c] tracking-wide mt-0.5">
-                    AEGIS disposes.
+                    NIYANTRA disposes.
                   </div>
                   <div className="w-8 h-0.5 bg-[#143d2b]/40 mt-2.5" />
                 </div>
@@ -757,7 +757,7 @@ export function SecurityOverview({
               How enforcement works
             </h2>
             <p className="text-xs text-[#79877e] mt-0.5">
-              From user request to audit log. The model proposes. AEGIS decides.
+              From user request to audit log. The model proposes. NIYANTRA decides.
             </p>
           </div>
 
@@ -876,7 +876,7 @@ export function SecurityOverview({
               <div className="flex items-center gap-2.5">
                 <Shield className="w-5 h-5 text-[#0e291c]" />
                 <h3 className="text-base font-bold text-[#111613]">
-                  AEGIS Architecture &amp; Execution Boundary
+                  NIYANTRA Architecture &amp; Execution Boundary
                 </h3>
               </div>
               <button
@@ -892,7 +892,7 @@ export function SecurityOverview({
               <div className="p-4 rounded-xl bg-[#f7f8f5] border border-[#e5e8e2]">
                 <strong className="text-[#111613] font-mono">The Core Principle:</strong>
                 <p className="mt-1 text-[#2d3a32]">
-                  &ldquo;Gemini proposes. AEGIS disposes.&rdquo; Autonomous LLM reasoners are treated as
+                  &ldquo;Gemini proposes. NIYANTRA disposes.&rdquo; Autonomous LLM reasoners are treated as
                   untrusted actors proposing JSON execution payloads. No tool call or network egress
                   reaches an external sink without deterministic pre-execution validation.
                 </p>

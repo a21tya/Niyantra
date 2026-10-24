@@ -85,7 +85,7 @@ export function SettingsView({
           </button>
 
           <div className="text-xs text-[#79877e]">
-            AEGIS v1.0.0 · JU Techfest 2026 CY-03
+            NIYANTRA v1.0.0 · JU Techfest 2026 CY-03
           </div>
         </div>
       </div>

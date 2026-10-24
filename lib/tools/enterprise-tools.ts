@@ -28,8 +28,8 @@ const FICTIONAL_DOCUMENTS: Record<string, { title: string; content: string; acce
     access: "public",
   },
   "public/kb/faq.md": {
-    title: "AEGIS Corporate FAQ",
-    content: "AEGIS provides AI security guardrails enforcing prompt boundaries, egress controls, and human-in-the-loop workflows.",
+    title: "NIYANTRA Corporate FAQ",
+    content: "NIYANTRA provides AI security guardrails enforcing prompt boundaries, egress controls, and human-in-the-loop workflows.",
     access: "public",
   },
   "internal/engineering/handbook.md": {

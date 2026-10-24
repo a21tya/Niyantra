@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   try {
     const contentLength = Number(req.headers.get("content-length") || 0);
     if (contentLength > MAX_FILE_SIZE_BYTES + 1024 * 1024) {
-      return NextResponse.json({ code: "UPLOAD_TOO_LARGE", message: "This upload is over AEGIS’s 10 MB maximum. Choose a smaller file and try again.", stage: "VALIDATION" }, { status: 413 });
+      return NextResponse.json({ code: "UPLOAD_TOO_LARGE", message: "This upload is over NIYANTRA’s 10 MB maximum. Choose a smaller file and try again.", stage: "VALIDATION" }, { status: 413 });
     }
     let body: Record<string, any>;
     let uploadedFile: File | undefined;
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       } else if (typeof body.fileBase64 === "string" && /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(body.fileBase64)) {
         originalPdf = Buffer.from(body.fileBase64, "base64");
       } else {
-        return NextResponse.json({ code: "INVALID_PDF", message: "Upload the original PDF file bytes so AEGIS can inspect the document safely.", stage: "VALIDATION" }, { status: 400 });
+        return NextResponse.json({ code: "INVALID_PDF", message: "Upload the original PDF file bytes so NIYANTRA can inspect the document safely.", stage: "VALIDATION" }, { status: 400 });
       }
       if (originalPdf.length < 8 || originalPdf.subarray(0, 5).toString("ascii") !== "%PDF-") {
         return NextResponse.json({ code: "INVALID_PDF", message: "The uploaded file does not have a valid PDF header.", stage: "VALIDATION" }, { status: 400 });

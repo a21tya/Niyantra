@@ -43,7 +43,7 @@ export function ProblemSection({ onSeeHowItWorks }: { onSeeHowItWorks: () => voi
                 onClick={onSeeHowItWorks}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-[#10b981] hover:text-[#34d399] transition-colors group"
               >
-                <span>Discover the AEGIS execution barrier</span>
+                <span>Discover the NIYANTRA execution barrier</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -120,7 +120,7 @@ export function ProblemSection({ onSeeHowItWorks }: { onSeeHowItWorks: () => voi
                 <div className="flex items-center gap-2.5 text-neutral-700">
                   <Lock className="w-4 h-4 text-[#10b981] shrink-0" />
                   <span>
-                    AEGIS isolates the agent proposal in a deterministic sandbox before any tool can run.
+                    NIYANTRA isolates the agent proposal in a deterministic sandbox before any tool can run.
                   </span>
                 </div>
                 <span className="text-[#34d399] font-bold shrink-0">FAIL-CLOSED</span>

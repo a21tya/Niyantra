@@ -37,7 +37,7 @@ export function ArtifactAnalysisSection({ onUpload }: { onUpload: () => void }) 
         <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-end">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-violet-200/70 bg-white/80 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-violet-700 shadow-sm backdrop-blur-sm">
-              <ScanLine className="h-4 w-4" /> AEGIS artifact intelligence
+              <ScanLine className="h-4 w-4" /> NIYANTRA artifact intelligence
             </div>
             <h2 className="mt-6 max-w-3xl text-4xl font-semibold leading-[1.04] tracking-[-0.055em] sm:text-6xl">
               See the risk hiding inside <span className="bg-gradient-to-r from-violet-700 via-fuchsia-600 to-cyan-600 bg-clip-text text-transparent">your AI stack.</span>
@@ -101,7 +101,7 @@ export function ArtifactAnalysisSection({ onUpload }: { onUpload: () => void }) 
             <div className="mt-5 flex flex-wrap gap-2">
               {SUPPORTED_FORMATS.map(({ extension, status }) => <span key={extension} title={status === "EXPERIMENTAL" ? "Experimental text extraction" : "Supported"} className={`rounded-lg border px-2.5 py-1.5 font-mono text-xs ${status === "EXPERIMENTAL" ? "border-amber-200 bg-amber-50 text-amber-700" : "border-neutral-200 bg-white/80 text-neutral-700"}`}>{extension}{status === "EXPERIMENTAL" && <sup className="ml-1 text-[8px] text-amber-500">EXP</sup>}</span>)}
             </div>
-            <div className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-neutral-500"><LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-500" />Static inspection only. Uploads are sent to the AEGIS scan API; artifacts are not executed.</div>
+            <div className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-neutral-500"><LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-500" />Static inspection only. Uploads are sent to the NIYANTRA scan API; artifacts are not executed.</div>
           </div>
           <div>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -114,7 +114,7 @@ export function ArtifactAnalysisSection({ onUpload }: { onUpload: () => void }) 
           </div>
         </div>
 
-        {/* Architecture & Why AEGIS */}
+        {/* Architecture & Why NIYANTRA */}
         <div className="mt-16 grid gap-5 lg:grid-cols-2">
           <div className="rounded-2xl border border-neutral-200/60 bg-white/70 p-6 backdrop-blur-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-600">Architecture & roadmap</p>
@@ -122,14 +122,14 @@ export function ArtifactAnalysisSection({ onUpload }: { onUpload: () => void }) 
               {[
                 ["MVP · now", "Browser upload → same-origin scan API → allowlist and size validation → static detectors → evidence, risk index, charts, exports."],
                 ["Next · depth", "Add language-aware parsing, dependency intelligence, improved PDF text extraction, and more precise detector coverage."],
-                ["Later · workflow", "Team policy profiles, CI checks, signed reports, and review workflows with runtime AEGIS decisions."],
+                ["Later · workflow", "Team policy profiles, CI checks, signed reports, and review workflows with runtime NIYANTRA decisions."],
               ].map(([title, copy]) => <div key={title} className="grid grid-cols-[92px_1fr] gap-3"><span className="pt-0.5 text-xs font-semibold text-amber-700">{title}</span><p className="text-sm leading-relaxed text-neutral-600">{copy}</p></div>)}
             </div>
           </div>
           <div className="rounded-2xl border border-violet-200/40 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-fuchsia-600">Why AEGIS</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-fuchsia-600">Why NIYANTRA</p>
             <h3 className="mt-2 text-2xl font-semibold text-neutral-900">From artifact review to action control.</h3>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-600">Prismor focuses on runtime agent enforcement, policy-as-code, audit visibility, secret cloaking, and skill/MCP supply-chain scanning. AEGIS differentiates with an artifact-first visual review and evidence/reporting flow connected to its action-policy gateway—so teams can inspect what an agent brings in, then govern what it tries to do.</p>
+            <p className="mt-3 text-sm leading-relaxed text-neutral-600">Prismor focuses on runtime agent enforcement, policy-as-code, audit visibility, secret cloaking, and skill/MCP supply-chain scanning. NIYANTRA differentiates with an artifact-first visual review and evidence/reporting flow connected to its action-policy gateway—so teams can inspect what an agent brings in, then govern what it tries to do.</p>
             <p className="mt-3 text-xs leading-relaxed text-neutral-400">This is a product-positioning distinction, not a claim that either tool detects every threat. Static MVP checks remain pattern-based; deeper analysis is on the roadmap.</p>
           </div>
         </div>

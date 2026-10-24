@@ -26,7 +26,7 @@ import { GET as exportScan } from "@/app/api/scans/[id]/export/route";
 import { extractPdfText } from "@/lib/scanner/pdf-text-extractor";
 import { parseGeminiThreatFindings } from "@/lib/scanner/gemini-artifact-review";
 
-describe("AEGIS Milestone 10 — Product Experience, Reporting & Integration Readiness", () => {
+describe("NIYANTRA Milestone 10 — Product Experience, Reporting & Integration Readiness", () => {
   beforeEach(() => {
     scanStore.clearLiveScans();
   });
@@ -172,7 +172,7 @@ describe("AEGIS Milestone 10 — Product Experience, Reporting & Integration Rea
       expect(analysis.assessment.score).toBe(0);
       expect(analysis.assessment.severityBand).toBe("INFORMATIONAL");
       expect(analysis.assessment.disclaimer).toContain("not a probability of breach");
-      expect(analysis.assessment.methodologyVersion).toBe("AEGIS-RMS-v2.0");
+      expect(analysis.assessment.methodologyVersion).toBe("NIYANTRA-RMS-v2.0");
     });
 
     it("covers each listed risk category and keeps credential evidence redacted", () => {
@@ -261,7 +261,7 @@ describe("AEGIS Milestone 10 — Product Experience, Reporting & Integration Rea
       const jsonExport = generateSanitizedJsonExport(credSample);
 
       expect(jsonExport.schemaVersion).toBe("1.0.0");
-      expect(jsonExport.product).toContain("AEGIS");
+      expect(jsonExport.product).toContain("NIYANTRA");
       expect(jsonExport.scanJob.id).toBe(credSample.id);
       expect(jsonExport.scanJob.findings.length).toBe(credSample.findings.length);
 
@@ -280,7 +280,7 @@ describe("AEGIS Milestone 10 — Product Experience, Reporting & Integration Rea
       expect(sarif.runs.length).toBe(1);
 
       const run = sarif.runs[0];
-      expect(run.tool.driver.name).toBe("AEGIS Artifact Security Guard");
+      expect(run.tool.driver.name).toBe("NIYANTRA Artifact Security Guard");
       expect(run.tool.driver.rules.length).toBeGreaterThan(0);
       expect(run.results.length).toBe(mcpSample.findings.length);
 
@@ -296,7 +296,7 @@ describe("AEGIS Milestone 10 — Product Experience, Reporting & Integration Rea
       const cmdSample = SYNTHETIC_DEMO_SAMPLES[2].job;
       const report = generateExecutiveMarkdownReport(cmdSample);
 
-      expect(report).toContain("# AEGIS Security Assessment Report");
+      expect(report).toContain("# NIYANTRA Security Assessment Report");
       expect(report).toContain("deploy_hook.sh");
       expect(report).toContain("Overall Risk Score");
       expect(report).toContain("Check Coverage & Detector Telemetry");

@@ -11,7 +11,7 @@ export interface AgentProposalResult {
 }
 
 const AVAILABLE_TOOLS_SYSTEM_PROMPT = `
-You are an enterprise AI assistant for a corporate environment protected by the AEGIS Security Guard.
+You are an enterprise AI assistant for a corporate environment protected by NIYANTRA.
 When a user asks you to take an action, you must propose a tool action.
 You NEVER execute tools directly. You only output a JSON object proposing the action:
 {

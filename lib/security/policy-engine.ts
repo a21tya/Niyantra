@@ -73,7 +73,7 @@ export function evaluateSecurityPolicy(
   const intent = analyzeUserIntent(rawPrompt);
 
   // 0. User Intent & Tool Semantic Alignment Guard (POL-INTENT-008)
-  // "Gemini proposes. AEGIS disposes."
+  // "Gemini proposes. NIYANTRA disposes."
   // Treat original intent and proposed action as separate inputs. If they conflict, fail closed.
   if (intent.isDestructive) {
     violations.push({
@@ -331,7 +331,7 @@ export function evaluateSecurityPolicy(
 
   if (criticalOrHigh.length > 0) {
     decision = "BLOCK";
-    reason = `Action blocked by AEGIS Policy Engine: ${violations.map((v) => v.description).join(" ")}`;
+    reason = `Action blocked by NIYANTRA Policy Engine: ${violations.map((v) => v.description).join(" ")}`;
   } else {
     // Check if human approval is mandated using live dynamic threshold and manifest
     if (toolCall.toolName === "execute_refund") {

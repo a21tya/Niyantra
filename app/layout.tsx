@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AEGIS — AI Agent Security Platform",
+  title: "NIYANTRA — AI Agent Security Platform",
   description:
     "Agent security, enforced at execution. Every proposed tool call is intercepted, validated, and checked against your policies before it can run.",
 };

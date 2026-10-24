@@ -32,6 +32,8 @@ interface ScanWorkspaceProps {
   onViewSample: (sample: SyntheticSample) => void;
   isScanning: boolean;
   setIsScanning: (scanning: boolean) => void;
+  openDemoPicker?: boolean;
+  onDemoPickerClosed?: () => void;
 }
 
 export function ScanWorkspace({
@@ -39,6 +41,8 @@ export function ScanWorkspace({
   onViewSample,
   isScanning,
   setIsScanning,
+  openDemoPicker = false,
+  onDemoPickerClosed,
 }: ScanWorkspaceProps) {
   const [selectedFiles, setSelectedFiles] = useState<
     Array<{
@@ -52,9 +56,19 @@ export function ScanWorkspace({
   const [scanProgress, setScanProgress] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showFormatsModal, setShowFormatsModal] = useState(false);
+  const [showDemoPicker, setShowDemoPicker] = useState(false);
   const [geminiReviewEnabled, setGeminiReviewEnabled] = useState(true);
   const [geminiStatus, setGeminiStatus] = useState<{ configured: boolean; model: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (openDemoPicker) setShowDemoPicker(true);
+  }, [openDemoPicker]);
+
+  const closeDemoPicker = () => {
+    setShowDemoPicker(false);
+    onDemoPickerClosed?.();
+  };
 
   useEffect(() => {
     let active = true;
@@ -215,7 +229,7 @@ export function ScanWorkspace({
               {!geminiStatus
                 ? "Checking server-side Gemini setup…"
                 : !geminiStatus.configured
-                  ? "No Gemini API key is configured. Local checks still work. Add GEMINI_API_KEY to .env.local on the server and restart AEGIS to enable AI review."
+                  ? "No Gemini API key is configured. Local checks still work. Add GEMINI_API_KEY to .env.local on the server and restart NIYANTRA to enable AI review."
                   : "When enabled, this sends the artifact (including original PDF bytes) to Google Gemini. On the free tier, Google may use submitted content to improve its products. Do not send confidential files unless your organization has approved that use. Uncheck for local-only scanning."}
             </span>
           </span>
@@ -295,14 +309,12 @@ export function ScanWorkspace({
         </div>
       </div>
 
-      <div className="rounded-xl border border-dashed border-violet-200 bg-gradient-to-r from-violet-50 via-white to-cyan-50 p-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div><div className="text-sm font-semibold text-[#202233]">Try safe sample artifacts</div><p className="text-xs text-[#707486]">Synthetic fixtures run through the same scan pipeline as your uploads. Gemini is used only when enabled and configured.</p></div>
-          <div className="flex flex-wrap gap-2 text-xs font-mono">
-            {["aegis-threat-demo.pdf", "prompt-override.prompt", "agent-config.mcp.json", "credential-demo.env", "unsafe-deploy.sh"].map((name) => <a key={name} href={`/test-artifacts/${name}`} download className="rounded-lg border border-white bg-white/90 px-2.5 py-1.5 text-violet-800 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-200">{name}</a>)}
-          </div>
-        </div>
-      </div>
+      <button type="button" onClick={() => setShowDemoPicker(true)} className="w-full rounded-2xl border border-violet-200 bg-gradient-to-r from-violet-50 via-white to-cyan-50 p-4 text-left transition hover:border-violet-300 hover:shadow-md">
+        <span className="flex flex-wrap items-center justify-between gap-3">
+          <span><span className="block text-sm font-semibold text-[#202233]">Want to try it first? Scan a demo artifact</span><span className="mt-1 block text-xs text-[#707486]">Choose from five safe, synthetic examples and see their findings instantly.</span></span>
+          <span className="rounded-xl bg-violet-700 px-4 py-2 text-xs font-semibold text-white">Choose demo files</span>
+        </span>
+      </button>
 
       {/* Queued Files List */}
       {selectedFiles.length > 0 && (
@@ -423,25 +435,15 @@ export function ScanWorkspace({
         </div>
       )}
 
-      {/* Synthetic Demonstration Mode Section */}
-      <div className="pt-4 border-t border-[#e5e8e2] space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-500" />
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#111613]">
-              Demonstration Mode — Synthetic Benchmark Artifacts
-            </h3>
-          </div>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-            MOCK / SYNTHETIC DATASET
-          </span>
+      {/* Demo artifact chooser */}
+      {showDemoPicker && (
+      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) closeDemoPicker(); }}>
+        <section role="dialog" aria-modal="true" aria-labelledby="demo-picker-title" className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-white/70 bg-white p-5 shadow-2xl sm:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div><div className="mb-2 inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-violet-700"><Sparkles className="h-3.5 w-3.5" /> Safe demo dataset</div><h3 id="demo-picker-title" className="text-2xl font-bold tracking-tight text-slate-950">Choose a file to scan</h3><p className="mt-1 text-sm text-slate-600">These synthetic files contain no real credentials. Select one to run it through the scanner and open its findings.</p></div>
+          <button type="button" onClick={closeDemoPicker} aria-label="Close demo file chooser" className="rounded-full border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"><X className="h-5 w-5" /></button>
         </div>
-
-        <p className="text-xs text-[#5c6760]">
-          Inspect five pre-configured synthetic samples to test detectors, evidence redaction, and diff remediation without uploading proprietary code.
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {SYNTHETIC_DEMO_SAMPLES.map((sample) => {
             const riskColor =
               sample.expectedRiskBand === "CRITICAL"
@@ -451,9 +453,9 @@ export function ScanWorkspace({
                 : "bg-emerald-50 text-emerald-800 border-emerald-200";
 
             return (
-              <div
+              <article
                 key={sample.id}
-                className="p-3.5 rounded-xl bg-white border border-[#e5e8e2] hover:border-[#10b981]/50 flex flex-col justify-between gap-3 text-xs shadow-soft transition-colors"
+                className="flex flex-col justify-between gap-3 rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-4 text-xs shadow-sm transition hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-md"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
@@ -466,29 +468,30 @@ export function ScanWorkspace({
                       {sample.expectedRiskBand}
                     </span>
                   </div>
-                  <p className="text-[11px] text-[#5c6760] mt-1 line-clamp-2">
+                  <p className="text-[11px] text-[#5c6760] mt-1 min-h-8 line-clamp-2">
                     {sample.description}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-[#e5e8e2] flex items-center justify-between gap-2">
-                  <span className="text-[10px] font-mono text-[#79877e]">
-                    {sample.type.toUpperCase()}
-                  </span>
+                <div className="flex items-center justify-between gap-2 border-t border-slate-200 pt-3">
+                  <div><span className="block text-[10px] font-mono text-[#79877e]">{sample.type.toUpperCase()}</span><span className="text-[10px] text-slate-500">Synthetic example</span></div>
                   <button
                     type="button"
-                    onClick={() => handleLoadSyntheticSample(sample.id)}
+                    onClick={() => { closeDemoPicker(); handleLoadSyntheticSample(sample.id); }}
                     disabled={isScanning}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#ebede8] hover:bg-[#10b981] hover:text-white text-[#111613] text-[11px] font-mono font-semibold transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-1 rounded-lg bg-slate-950 px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-violet-700 disabled:opacity-50"
                   >
-                    <span>Load Sample</span>
+                    <Play className="h-3 w-3" /><span>Scan file</span>
                   </button>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-slate-50 p-4"><div><p className="text-sm font-semibold text-slate-800">Prefer downloadable fixtures?</p><p className="text-xs text-slate-500">These files are also available to inspect or save locally.</p></div><div className="flex flex-wrap gap-2">{["clean-sample.txt", "credential-demo.env", "unsafe-deploy.sh", "prompt-override.prompt", "agent-config.mcp.json"].map((name) => <a key={name} href={`/test-artifacts/${name}`} download className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-medium text-slate-700 hover:border-violet-300 hover:text-violet-700">{name}</a>)}</div></div>
+        </section>
       </div>
+      )}
 
       {/* Supported Formats Modal */}
       {showFormatsModal && (
@@ -512,7 +515,7 @@ export function ScanWorkspace({
 
             <div className="p-4 overflow-y-auto space-y-3 text-xs">
               <div className="text-[11px] text-[#5c6760]">
-                Maximum file size is 10 MB (some formats have smaller limits). Pattern-based scans run statically; uploaded content is sent to the AEGIS scan API and is never executed.
+                Maximum file size is 10 MB (some formats have smaller limits). Pattern-based scans run statically; uploaded content is sent to the NIYANTRA scan API and is never executed.
               </div>
 
               <div className="divide-y divide-[#e5e8e2] border border-[#e5e8e2] rounded-xl overflow-hidden">

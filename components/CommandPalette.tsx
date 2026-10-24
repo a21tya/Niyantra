@@ -342,7 +342,7 @@ export function CommandPalette({
       className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 bg-black/40 backdrop-blur-sm p-4"
       role="dialog"
       aria-modal="true"
-      aria-label="AEGIS Command Palette and Global Search"
+      aria-label="NIYANTRA Command Palette and Global Search"
       onClick={onClose}
     >
       <div

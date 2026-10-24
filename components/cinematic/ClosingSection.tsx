@@ -18,7 +18,7 @@ export function ClosingSection({ onLaunchConsole, onNavigateToDemo }: { onLaunch
               <Sparkles className="inline h-3.5 w-3.5 mr-1" />Built for confident AI
             </p>
             <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Give your AI agents clear boundaries.</h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">Move quickly with confidence. AEGIS keeps each action accountable.</p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">Move quickly with confidence. NIYANTRA keeps each action accountable.</p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <button type="button" onClick={onLaunchConsole} className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-medium text-violet-900 transition hover:bg-violet-50 shadow-lg"><Terminal className="h-4 w-4" />Open console<ArrowRight className="h-4 w-4" /></button>
               <button type="button" onClick={onNavigateToDemo} className="rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10">Try a scenario</button>
@@ -26,9 +26,9 @@ export function ClosingSection({ onLaunchConsole, onNavigateToDemo }: { onLaunch
           </div>
         </div>
         <div className="flex flex-col items-center justify-between gap-4 py-6 text-sm text-neutral-500 sm:flex-row">
-          <a href="#hero" className="flex items-center gap-2 font-semibold text-neutral-900"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white"><Shield className="h-4 w-4" /></span>AEGIS</a>
+          <a href="#hero" className="flex items-center gap-2 font-semibold text-neutral-900"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white"><Shield className="h-4 w-4" /></span>NIYANTRA</a>
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2"><a href="#how-it-works" className="hover:text-neutral-900">How it works</a><a href="#capabilities" className="hover:text-neutral-900">Security</a><a href="#interactive-demo" className="hover:text-neutral-900">Try a scenario</a><button type="button" onClick={onLaunchConsole} className="hover:text-neutral-900">Console</button></nav>
-          <span>© 2026 AEGIS</span>
+          <span>© 2026 NIYANTRA</span>
         </div>
       </div>
     </footer>

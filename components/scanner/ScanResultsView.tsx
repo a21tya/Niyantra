@@ -61,7 +61,7 @@ export function ScanResultsView({
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `aegis-scan-${scanJob.id}.${ext}`;
+        a.download = `niyantra-scan-${scanJob.id}.${ext}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -354,7 +354,7 @@ export function ScanResultsView({
           <div>
             <div className="text-[10px] uppercase text-[#79877e]">Methodology</div>
             <div className="text-[#111613] font-medium mt-0.5">
-              {assessment?.methodologyVersion ?? "AEGIS-RMS-v1.4"}
+              {assessment?.methodologyVersion ?? "NIYANTRA-RMS-v1.4"}
             </div>
           </div>
         </div>

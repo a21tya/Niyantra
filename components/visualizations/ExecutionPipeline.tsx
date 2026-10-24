@@ -162,7 +162,7 @@ export function ExecutionPipeline({
             EXECUTION PIPELINE
           </span>
           <span className="hidden sm:inline-block text-[11px] text-[#5c6760]">
-            · &ldquo;Gemini proposes. AEGIS disposes.&rdquo;
+            · &ldquo;Gemini proposes. NIYANTRA disposes.&rdquo;
           </span>
         </div>
 

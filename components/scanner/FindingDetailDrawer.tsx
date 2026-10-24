@@ -243,7 +243,7 @@ export function FindingDetailDrawer({
           <div className="p-3.5 rounded-xl bg-[#f7f8f5] border border-[#e5e8e2] text-[11px] text-[#5c6760] flex items-start gap-2">
             <Info className="w-4 h-4 text-[#10b981] shrink-0 mt-0.5" />
             <div>
-              <span className="font-semibold text-[#111613]">Zero Auto-Mutation Guarantee:</span> AEGIS provides remediation guidance and reviewable diffs. It never automatically executes or modifies your source code.
+              <span className="font-semibold text-[#111613]">Zero Auto-Mutation Guarantee:</span> NIYANTRA provides remediation guidance and reviewable diffs. It never automatically executes or modifies your source code.
             </div>
           </div>
         </div>

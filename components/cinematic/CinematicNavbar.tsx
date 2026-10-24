@@ -30,9 +30,9 @@ export function CinematicNavbar({
   return (
     <header className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${scrolled ? "border-violet-100/60 bg-white/95 py-3 shadow-[0_4px_24px_rgba(167,139,250,0.08)] backdrop-blur-xl" : "border-transparent bg-white/70 py-4 backdrop-blur-md"}`}>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8">
-        <a href="#hero" className="flex items-center gap-2.5 text-neutral-950" aria-label="AEGIS home">
+        <a href="#hero" className="flex items-center gap-2.5 text-neutral-950" aria-label="NIYANTRA home">
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white shadow-[0_4px_12px_rgba(167,139,250,0.35)]"><Shield className="h-[18px] w-[18px]" /></span>
-          <span className="text-xl font-semibold tracking-[-0.05em]">AEGIS</span>
+          <span className="text-xl font-semibold tracking-[-0.05em]">NIYANTRA</span>
           <span className="hidden rounded-full border border-violet-200 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-violet-600 lg:inline">AI Security</span>
         </a>
         <nav className="hidden items-center gap-8 text-sm font-medium text-neutral-700 lg:flex">

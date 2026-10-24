@@ -178,7 +178,7 @@ export function normalizeScanJob(raw: any): ScanJob {
             total: Number(raw.assessment.counts?.total || 0),
           },
           categoryScores: raw.assessment.categoryScores || {},
-          methodologyVersion: String(raw.assessment.methodologyVersion || "AEGIS-RMS-v1.4"),
+          methodologyVersion: String(raw.assessment.methodologyVersion || "NIYANTRA-RMS-v1.4"),
           disclaimer: String(
             raw.assessment.disclaimer ||
               "A score of zero indicates no findings from the checks completed. It does not guarantee that the artifact is safe."

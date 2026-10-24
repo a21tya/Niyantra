@@ -11,8 +11,8 @@
   --text-primary: #f4f5f2;
   --text-secondary: #9ca3af;
   --text-muted: #6b7280;
-  --aegis-emerald: #10b981;
-  --aegis-forest: #0e382b;
+  --niyantra-emerald: #10b981;
+  --niyantra-forest: #0e382b;
   --accent-cyan: #22d3ee;
   --accent-violet: #a78bfa;
   --accent-rose: #fb7185;
@@ -98,7 +98,7 @@ body {
 
 /* Keyboard Focus Visibility */
 :focus-visible {
-  outline: 2px solid var(--aegis-emerald);
+  outline: 3px solid rgba(109, 40, 217, 0.72);
   outline-offset: 2px;
 }
 
@@ -133,6 +133,21 @@ body {
   background-position: center;
   background-size: cover;
 }
+.niyantra-radar-card { animation: radar-card-float 6.5s ease-in-out infinite; }
+.niyantra-radar { position: relative; display: grid; width: 88px; height: 88px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: radial-gradient(circle,#f5f1ff 0 34%,#ece5ff 35% 36%,transparent 37%), linear-gradient(145deg,rgba(124,58,237,.08),rgba(34,211,238,.08)); overflow: hidden; }
+.niyantra-radar-ring { position: absolute; inset: 9px; border: 1px solid rgba(124,58,237,.24); border-radius: 50%; }
+.niyantra-radar-ring.ring-two { inset: 23px; border-color: rgba(34,180,180,.34); }
+.niyantra-radar-ring.ring-three { inset: 36px; border-color: rgba(244,99,150,.35); }
+.niyantra-radar-sweep { position: absolute; inset: 4px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0deg 280deg, rgba(76,201,190,.38) 350deg, transparent 360deg); animation: radar-sweep 6s linear infinite; }
+.niyantra-radar-core { position: relative; z-index: 2; display: grid; width: 34px; height: 34px; place-items: center; border-radius: 12px; background: linear-gradient(145deg,#6d3be8,#c448a9 62%,#13a99a); color: white; box-shadow: 0 6px 18px rgba(104,57,203,.32); }
+.radar-signal { position: absolute; z-index: 3; width: 7px; height: 7px; border: 1.5px solid white; border-radius: 50%; background: #ff668c; box-shadow: 0 0 0 3px rgba(255,102,140,.2),0 0 12px rgba(255,102,140,.7); animation: signal-ping 2s ease-in-out infinite; }
+.radar-signal.signal-one { top: 16px; left: 28px; }
+.radar-signal.signal-two { top: 39px; right: 13px; background: #38bfa3; box-shadow: 0 0 0 3px rgba(56,191,163,.2),0 0 12px rgba(56,191,163,.7); animation-delay: -.6s; }
+.radar-signal.signal-three { bottom: 12px; left: 39px; background: #ffb547; box-shadow: 0 0 0 3px rgba(255,181,71,.2),0 0 12px rgba(255,181,71,.7); animation-delay: -1.1s; }
+.radar-signal.signal-four { top: 25px; right: 23px; background: #40b8ef; box-shadow: 0 0 0 3px rgba(64,184,239,.2),0 0 12px rgba(64,184,239,.7); animation-delay: -.3s; }
+@keyframes radar-sweep { to { transform: rotate(360deg); } }
+@keyframes signal-ping { 0%,100% { transform: scale(.78); opacity: .8; } 50% { transform: scale(1.22); opacity: 1; } }
+@keyframes radar-card-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 
 @media (max-width: 640px) {
   .aegis-hero-lines { opacity: 0.3; }
@@ -170,7 +185,7 @@ body {
     );
 }
 
-/* AEGIS Agent Panel — vibrant multi-colour gradient */
+/* NIYANTRA Agent Panel — vibrant multi-colour gradient */
 .aegis-agent-panel {
   background:
     radial-gradient(ellipse at 10% 35%, rgba(251, 113, 133, 0.3), transparent 34%),
@@ -245,7 +260,13 @@ body {
 .aegis-line-agent { display: flex; flex: 1 1 0; min-width: 0; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 0; border: 0; background: transparent; cursor: pointer; transition: transform 180ms ease; }
 .aegis-line-agent:hover, .aegis-line-agent.is-selected { transform: translateY(-8px); }
 .aegis-line-agent:focus-visible { outline: 3px solid var(--agent-accent); outline-offset: 4px; border-radius: 16px; }
-.aegis-line-agent-art { display: block; width: clamp(96px, 15vw, 180px); aspect-ratio: .6; flex: 0 0 auto; background: url('/aegis-agents.png') no-repeat; background-size: 500% 100%; background-position: var(--sprite-position); filter: drop-shadow(0 15px 12px rgba(72,55,91,.2)); }
+.aegis-line-agent-art { display: flex; width: 100%; height: clamp(180px, 29vw, 300px); flex: 0 0 auto; align-items: flex-end; justify-content: center; overflow: visible; }
+.aegis-line-agent-art img { display: block; width: auto; height: 100%; max-width: 100%; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 15px 12px rgba(72,55,91,.2)); animation: niyantra-agent-bob 4.2s ease-in-out infinite; transform-origin: center bottom; }
+.aegis-line-agent:nth-child(2) .aegis-line-agent-art img { animation-delay: -.8s; }
+.aegis-line-agent:nth-child(3) .aegis-line-agent-art img { animation-delay: -1.6s; }
+.aegis-line-agent:nth-child(4) .aegis-line-agent-art img { animation-delay: -2.4s; }
+.aegis-line-agent:nth-child(5) .aegis-line-agent-art img { animation-delay: -3.2s; }
+.aegis-agent-line.is-paused .aegis-line-agent-art img { animation-play-state: paused; }
 .aegis-line-agent-label { display: grid; min-width: 104px; border: 1px solid color-mix(in srgb,var(--agent-accent) 22%,white); border-radius: 12px; padding: 5px 8px; background: rgba(255,255,255,.82); color: #292339; font-size: 11px; line-height: 1.2; box-shadow: 0 4px 14px rgba(62,46,80,.08); }
 .aegis-line-agent-label small { color: #6f6878; font-size: 9px; }
 .aegis-line-detail { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; gap: 12px; max-width: 700px; margin: 12px auto 0; border: 1px solid rgba(168,77,213,.18); border-radius: 16px; padding: 12px 42px 12px 16px; background: rgba(255,255,255,.9); color: #292339; font-size: 13px; box-shadow: 0 14px 32px rgba(120,60,160,.1); }
@@ -257,12 +278,14 @@ body {
 
 @media (max-width: 640px) {
   .aegis-agent-line { gap: 0; min-height: 190px; margin-inline: -8px; }
-  .aegis-line-agent-art { width: clamp(58px, 17vw, 92px); }
+  .aegis-line-agent-art { height: clamp(115px, 39vw, 170px); }
   .aegis-line-agent-label { min-width: 66px; padding: 4px 3px; font-size: 9px; }
   .aegis-line-agent-label small { font-size: 8px; }
   .aegis-line-detail { font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) { .aegis-agent-line { animation: none; } }
+
+@keyframes niyantra-agent-bob { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-7px) rotate(1deg); } }
 
 @keyframes aegis-art-drift {
   from { transform: scale(1); }
@@ -337,4 +360,82 @@ body {
   .scroll-creature-container { display: none !important; }
   .aegis-artifact-orb-1,
   .aegis-artifact-orb-2 { animation: none; }
+}
+
+/* NIYANTRA console: quiet surfaces, clear hierarchy, and focused security accents. */
+.niyantra-console {
+  --console-ink: #172033;
+  --console-muted: #627086;
+  --console-line: #e2e8f0;
+  --console-accent: #2563eb;
+  min-height: 100vh;
+  background: #f4f6f9;
+  color: var(--console-ink);
+}
+.niyantra-console aside {
+  width: 250px;
+  background: #111c2e;
+  border-color: rgba(255,255,255,.08);
+  color: #f8fafc;
+  box-shadow: 8px 0 24px rgba(15,23,42,.06);
+}
+.niyantra-console aside [class*="text-[#111613]"] { color: #fff !important; }
+.niyantra-console aside [class*="text-[#5c6760]"],
+.niyantra-console aside [class*="text-[#79877e]"] { color: #a8b4c5 !important; }
+.niyantra-console aside [class*="border-[#e5e8e2]"] { border-color: rgba(255,255,255,.1) !important; }
+.niyantra-console aside [class*="bg-[#f7f8f5]"],
+.niyantra-console aside [class*="bg-white"] { background-color: rgba(255,255,255,.055) !important; color: #f8fafc !important; }
+.niyantra-console aside [class*="bg-[#ebede8]"] { background: #24344d !important; color: #fff !important; }
+.niyantra-console aside [class*="text-[#0e291c]"] { color: #93c5fd !important; }
+.niyantra-console aside [class*="bg-[#091a12]"] { background: #18263b !important; border: 1px solid rgba(255,255,255,.09); }
+.niyantra-console header {
+  background: rgba(255,255,255,.96);
+  border-color: var(--console-line);
+  box-shadow: 0 2px 8px rgba(15,23,42,.035);
+}
+.niyantra-console main {
+  background: transparent;
+  color: var(--console-ink);
+}
+.niyantra-console main [class*="shadow-soft"] {
+  box-shadow: 0 2px 10px rgba(15,23,42,.045);
+}
+.niyantra-console main [class*="bg-white"] {
+  border-color: var(--console-line);
+}
+.niyantra-console main button:not([class*="bg-"]):hover { color: var(--console-accent); }
+.niyantra-console main [class*="text-[#111613]"] { color: var(--console-ink) !important; }
+.niyantra-console main [class*="text-[#5c6760]"],
+.niyantra-console main [class*="text-[#79877e]"] { color: var(--console-muted) !important; }
+.niyantra-console main [class*="border-[#e5e8e2]"] { border-color: var(--console-line) !important; }
+.niyantra-console main [class*="bg-[#f7f8f5]"] { background-color: #f8fafc !important; }
+.niyantra-console main [class*="bg-[#ebede8]"] { background-color: #edf2f8 !important; }
+.niyantra-console main [class*="bg-[#0e291c]"] { background: #1d4ed8 !important; }
+.niyantra-console main [class*="text-[#10b981]"],
+.niyantra-console header [class*="text-[#10b981]"] { color: #2563eb !important; }
+.niyantra-console main [class*="focus:ring-[#0e291c]"]:focus { --tw-ring-color: #93c5fd !important; }
+.niyantra-console main .font-mono { font-family: inherit !important; letter-spacing: normal !important; }
+.niyantra-console main .finding-evidence { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important; }
+.niyantra-console main pre,
+.niyantra-console main code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.niyantra-console main [class*="bg-gradient-to-br"] { background-image: linear-gradient(135deg, #fff, #f8fafc 70%, #f8fafc) !important; }
+.niyantra-console > .flex-1 > main > section,
+.niyantra-console > .flex-1 > main > div { animation: console-surface-in .32s ease both; }
+.niyantra-console .fixed.inset-0.lg\:hidden .w-72 {
+  background: #111c2e !important;
+  border-color: rgba(255,255,255,.12) !important;
+  color: #f8fafc;
+}
+.niyantra-console .fixed.inset-0.lg\:hidden [class*="text-[#111613]"],
+.niyantra-console .fixed.inset-0.lg\:hidden [class*="text-[#5c6760]"] { color: #f8fafc !important; }
+.niyantra-console .fixed.inset-0.lg\:hidden [class*="bg-[#ebede8]"] { background: #24344d !important; }
+@keyframes console-surface-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 640px) {
+  .niyantra-console aside { width: min(88vw, 300px); }
+  .niyantra-console header { padding-inline: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aegis-line-agent-art img,
+  .niyantra-console > .flex-1 > main > section,
+  .niyantra-console > .flex-1 > main > div { animation: none !important; }
 }

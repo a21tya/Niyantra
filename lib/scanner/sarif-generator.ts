@@ -67,7 +67,7 @@ export function mapSeverityToSarifLevel(
 }
 
 /**
- * Generates an OASIS SARIF 2.1.0 compliant log from an AEGIS ScanJob.
+ * Generates an OASIS SARIF 2.1.0 compliant log from an NIYANTRA ScanJob.
  */
 export function generateSarifLog(job: ScanJob): SarifLog {
   const uniqueRules = new Map<string, SarifRule>();
@@ -131,7 +131,7 @@ export function generateSarifLog(job: ScanJob): SarifLog {
       {
         tool: {
           driver: {
-            name: "AEGIS Artifact Security Guard",
+            name: "NIYANTRA Artifact Security Guard",
             version: "1.0.0",
             informationUri: "https://github.com/a21tya/Niyantra",
             rules: Array.from(uniqueRules.values()),

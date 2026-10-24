@@ -683,7 +683,7 @@ export function PolicyControlCenter({
             <div className="font-bold text-slate-100">Intercept-First Isolation</div>
             <p className="text-[11px] text-slate-400 leading-relaxed">
               Gemini never holds tool handles or credentials. Every proposed action is evaluated by
-              AEGIS before any mock tool sink is called.
+              NIYANTRA before any mock tool sink is called.
             </p>
           </div>
 

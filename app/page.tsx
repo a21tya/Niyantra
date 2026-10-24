@@ -110,10 +110,11 @@ const DEMO_PERSONAS = [
   },
 ];
 
-export default function AegisApp() {
+export default function NiyantraApp() {
   // Main view mode: "website" (cinematic public site) or "console" (SOC operational console)
   const [viewMode, setViewMode] = useState<"website" | "console">("website");
   const [activeTab, setActiveTab] = useState<AppScreenId>("overview");
+  const [openDemoPicker, setOpenDemoPicker] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [inspectorTarget, setInspectorTarget] = useState<InspectorTarget>(null);
@@ -624,9 +625,9 @@ export default function AegisApp() {
         />
 
         {/* Artifact analysis follows the hero. */}
-        <ArtifactAnalysisSection onUpload={() => { setActiveTab("scan-workspace"); setViewMode("console"); }} />
+        <ArtifactAnalysisSection onUpload={() => { setOpenDemoPicker(true); setActiveTab("scan-workspace"); setViewMode("console"); }} />
 
-        {/* Section 2: Meet the AEGIS team */}
+        {/* Section 2: Meet the NIYANTRA team */}
         <HowItWorksSection />
 
         {/* Section 4: Security Capabilities */}
@@ -719,7 +720,7 @@ export default function AegisApp() {
   // VIEW 2: OPERATIONS CONSOLE (SOC Dashboard)
   // ==========================================
   return (
-    <div className="min-h-screen bg-[#f7f8f5] text-[#111613] flex font-sans antialiased">
+    <div className="niyantra-console min-h-screen bg-[#f7f8f5] text-[#111613] flex font-sans antialiased">
       {/* Left Navigation Rail */}
       {activeTab !== "scan-results" && <aside className="hidden lg:flex w-60 shrink-0 bg-[#f7f8f5] border-r border-[#e5e8e2] flex-col justify-between p-4 sticky top-0 h-screen select-none">
         <div className="space-y-6">
@@ -735,7 +736,7 @@ export default function AegisApp() {
               </div>
               <div>
                 <div className="font-display font-bold text-sm tracking-tight text-[#111613]">
-                  AEGIS
+                  NIYANTRA
                 </div>
                 <div className="text-[9px] font-mono tracking-widest uppercase text-[#79877e]">
                   SECURITY CONSOLE
@@ -816,7 +817,7 @@ export default function AegisApp() {
             <div className="text-xs font-display font-medium leading-relaxed text-[#e5f5ec]">
               Your agents can think.
               <br />
-              <strong className="text-white font-bold">AEGIS decides</strong> what they can do.
+              <strong className="text-white font-bold">NIYANTRA decides</strong> what they can do.
             </div>
 
             <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-[#a5cbb7]">
@@ -844,7 +845,7 @@ export default function AegisApp() {
               {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <span className="font-display font-bold text-sm text-[#111613]">
-              AEGIS CONSOLE
+              NIYANTRA CONSOLE
             </span>
           </div>
 
@@ -923,7 +924,7 @@ export default function AegisApp() {
 
             <div className="flex items-center gap-1.5 cursor-pointer">
               <div className="w-8 h-8 rounded-full bg-[#111613] text-white font-bold text-xs flex items-center justify-center">
-                A
+                N
               </div>
               <ChevronDown className="w-3 h-3 text-[#79877e]" />
             </div>
@@ -997,6 +998,8 @@ export default function AegisApp() {
 
           {activeTab === "scan-workspace" && (
             <ScanWorkspace
+              openDemoPicker={openDemoPicker}
+              onDemoPickerClosed={() => setOpenDemoPicker(false)}
               isScanning={isScanningArtifact}
               setIsScanning={setIsScanningArtifact}
               onScanCompleted={(job, batchCount) => {
@@ -1022,7 +1025,7 @@ export default function AegisApp() {
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e5e8e2] bg-white px-5 py-4 shadow-sm">
                 <div className="flex items-center gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700"><ShieldAlert className="h-5 w-5" /></div>
-                  <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">AEGIS artifact report</p><p className="text-sm text-slate-600">A clear summary of this file’s security review</p></div>
+                  <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">NIYANTRA artifact report</p><p className="text-sm text-slate-600">A clear summary of this file’s security review</p></div>
                 </div>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setActiveTab("scan-workspace")} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">Scan another file</button>
@@ -1226,7 +1229,7 @@ export default function AegisApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-3 border-b border-[#e5e8e2]">
                 <div className="font-display font-bold text-sm text-[#111613]">
-                  AEGIS CONSOLE
+                  NIYANTRA CONSOLE
                 </div>
                 <button
                   type="button"

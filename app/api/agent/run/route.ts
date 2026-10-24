@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     proposal.toolCall.originalPrompt = prompt;
 
-    // 3. AEGIS Security Gateway Step: Gemini proposes, AEGIS disposes!
+    // 3. NIYANTRA Security Gateway Step: Gemini proposes, NIYANTRA disposes!
     const gatewayResult = await processToolCallThroughGateway(proposal.toolCall);
 
     return NextResponse.json({
